@@ -1,0 +1,15 @@
+{
+  "project": "Throttle Rush",
+  "currentPhase": 0,
+  "phases": {
+    "0": { "name": "Opzet en publicatie-route", "status": "in_progress", "done": ["git init", "vite + three", "lege scene", "fps-meter", "prompt-log haken"], "todo": ["contracten (wacht op md-beslissing)", "vercel publicatie (wacht op keuze)"] },
+    "1": { "name": "Circuit en rijden", "status": "pending" },
+    "2": { "name": "Drie motortypes en ondergrond", "status": "pending" },
+    "3": { "name": "Race-logica en HUD", "status": "pending" },
+    "4": { "name": "Computer-tegenstanders", "status": "pending" },
+    "5": { "name": "Speciale knoppen en botsingen", "status": "pending" },
+    "6": { "name": "Polish (optioneel)", "status": "pending" },
+    "7": { "name": "Prestatie-check en eindpublicatie", "status": "pending" }
+  },
+  "nextStep": "Fase 0 afronden: Vercel-publicatie, daarna commit."
+}
