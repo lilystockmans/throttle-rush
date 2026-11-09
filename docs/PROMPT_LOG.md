@@ -37,3 +37,5 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 19:37:53 | 19:39:01 | 1m 08s | Game designer | Fase 5: knopwaarden per type, CONFIG.collisions, cruiser iets sneller volgens contract 08-A |
 | 2026-11-09 | 19:37:53 | 19:39:11 | 1m 18s | UX/UI-specialist | Fase 5: knop-meter en treffermelding in de HUD volgens contract 08-F |
 | 2026-11-09 | 19:37:53 | 19:43:57 | 6m 04s | Coder | Fase 5: Bike push/stun/modifiers, abilities, botsingen, AI gebruikt knoppen volgens contract 08 B-E |
+| 2026-11-09 | 19:48:18 | 19:50:31 | 2m 13s | Lily | Fase 7: afronden |
+| 2026-11-09 | 19:50:27 | 20:00:13 | 9m 46s | Tester | Fase 7: eindtest van de live game als speler (menu, drie moto's, knoppen, botsingen, shortcut, finish), bevindingen in docs/tests/fase7-eindtest.md |

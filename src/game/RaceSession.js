@@ -10,6 +10,10 @@ import { AIDriver } from "../race/AIDriver.js";
 import { createAbility } from "../bikes/abilities.js";
 import { resolveCollisions } from "../bikes/collisions.js";
 import { Rider } from "./Rider.js";
+import { headingFromTangent } from "../world/Track.js";
+
+// Meter naast de middenlijn waarna je automatisch teruggezet wordt.
+const MAX_OFF_TRACK = 45;
 
 // Naam van de speciale knop zoals de speler hem ziet.
 const ABILITY_NAMES = { turbo: "Turbo", offroad: "Offroad-boost", shove: "Zijduw" };
@@ -103,7 +107,21 @@ export class RaceSession {
       bike.update(dt, controls);
     }
     if (canMove) resolveCollisions(bikes);
+    this.keepNearTrack();
     this.race.update(dt);
+  }
+
+  // Wie te ver van de baan rijdt (en niet op de shortcut zit), komt automatisch terug.
+  // Zo kan niemand de rand van de wereld bereiken of verdwalen in het gras.
+  keepNearTrack() {
+    for (const r of this.riders) {
+      const bike = r.rider.bike;
+      const near = this.track.getNearest(bike.position.x, bike.position.z);
+      const onShortcut = bike.surface === "dirt";
+      if (Math.abs(near.lateral) < MAX_OFF_TRACK || onShortcut) continue;
+      bike.resetTo({ position: near.position.clone(), heading: headingFromTangent(near.tangent.x, near.tangent.z) });
+      if (r.id === "player") this.raceUI.flash("Terug op de baan");
+    }
   }
 
   // Wie stuurt deze moto? De computer, de speler, of (na de finish) de autopiloot.

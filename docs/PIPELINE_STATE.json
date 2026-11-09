@@ -1,6 +1,6 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 5,
+  "currentPhase": 7,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
@@ -79,7 +79,7 @@
     },
     "5": {
       "name": "Speciale knoppen en botsingen",
-      "status": "wacht op test van Lily",
+      "status": "done",
       "done": [
         "contract 08",
         "turbo/offroad-boost/zijduw",
@@ -98,12 +98,27 @@
     },
     "6": {
       "name": "Polish (optioneel)",
-      "status": "pending"
+      "status": "overgeslagen"
     },
     "7": {
       "name": "Prestatie-check en eindpublicatie",
-      "status": "pending"
+      "status": "done",
+      "done": [
+        "meting: 150 draw calls, 44.750 driehoeken, 1,85 ms render, 0,03 ms update (Apple M5)",
+        "AutoQuality: pixelRatio 1.5 -> 1 -> 0.75 -> schaduw uit onder 48 fps",
+        "vite.config.js: waarschuwingsgrens 700 kB; game 156 kB gzip",
+        "automatisch terug op de baan na 45 m naast de middenlijn (wereldrand onbereikbaar)",
+        "live: 200 OK, pagina 0,2 s, game-code 0,26 s",
+        "eindtest tester: docs/tests/fase7-eindtest.md"
+      ],
+      "open": [
+        "niet gemeten op een echte gewone laptop: Lily test",
+        "tester-paneel draaide 0,5-2 fps: volledige race en finish niet door tester bekeken (wel door synchrone simulatie)",
+        "besturingsuitleg kan race-paneel overlappen in vensters kleiner dan 768x500",
+        "label Offroad-boost breekt over 2 regels in HUD",
+        "fase 6 polish niet gedaan (geluid, stof, grotere vlam)"
+      ]
     }
   },
-  "nextStep": "Lily test fase 5. Daarna fase 6 (polish, optioneel) of fase 7 (prestatie-check en eindpublicatie)."
+  "nextStep": "Project af. Optioneel: fase 6 polish."
 }
