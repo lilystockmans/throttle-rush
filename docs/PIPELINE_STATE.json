@@ -1,6 +1,6 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 4,
+  "currentPhase": 5,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
@@ -61,7 +61,7 @@
     },
     "4": {
       "name": "Computer-tegenstanders",
-      "status": "wacht op test van Lily",
+      "status": "done",
       "done": [
         "contract 07",
         "AIDriver: 0 resets, cross-AI neemt shortcut, 11 µs per stap voor 6",
@@ -79,7 +79,22 @@
     },
     "5": {
       "name": "Speciale knoppen en botsingen",
-      "status": "pending"
+      "status": "wacht op test van Lily",
+      "done": [
+        "contract 08",
+        "turbo/offroad-boost/zijduw",
+        "botsingen met massa (0 overlappen in volledige race)",
+        "AI gebruikt knoppen 4-8x per race",
+        "knop-meter + treffermelding",
+        "turbovlam",
+        "fout opgelost: spatie uit menu vuurde turbo bij GO",
+        "0.02 ms per rekenstap voor 6 rijders"
+      ],
+      "open": [
+        "turbovlam klein van op camera-afstand",
+        "Opa Oliebol gebruikt zijduw zelden (rijdt achteraan alleen)",
+        "paneel throttlet: geen visuele fps-meting deze fase"
+      ]
     },
     "6": {
       "name": "Polish (optioneel)",
@@ -90,5 +105,5 @@
       "status": "pending"
     }
   },
-  "nextStep": "Lily test fase 4. Daarna fase 5: botsingen en speciale knoppen."
+  "nextStep": "Lily test fase 5. Daarna fase 6 (polish, optioneel) of fase 7 (prestatie-check en eindpublicatie)."
 }

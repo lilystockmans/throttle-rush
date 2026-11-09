@@ -31,3 +31,9 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 19:25:54 | 19:27:13 | 1m 19s | UX/UI-specialist | Fase 4: klassement op het finish-scherm, updateStandings volgens contract 07-C |
 | 2026-11-09 | 19:25:54 | 19:29:50 | 3m 56s | Coder | Fase 4: AIDriver (baan volgen, remmen voor bochten, shortcut, reset) volgens contract 07-B |
 | 2026-11-09 | 19:36:07 | 19:37:00 | 0m 53s | Lily | also add a kort en krachtig readme.md |
+| 2026-11-09 | 19:37:10 | 19:38:57 | 1m 47s | Lily | Ja, start fase 5 |
+| 2026-11-09 | 19:37:53 | 19:38:37 | 0m 44s | Shading-specialist | Fase 5: vlam-materialen flame en flameCore volgens contract 08-H |
+| 2026-11-09 | 19:37:53 | 19:38:40 | 0m 47s | 3D-modelleur | Fase 5: turbovlam boostFlame op elk moto-model volgens contract 08-G |
+| 2026-11-09 | 19:37:53 | 19:39:01 | 1m 08s | Game designer | Fase 5: knopwaarden per type, CONFIG.collisions, cruiser iets sneller volgens contract 08-A |
+| 2026-11-09 | 19:37:53 | 19:39:11 | 1m 18s | UX/UI-specialist | Fase 5: knop-meter en treffermelding in de HUD volgens contract 08-F |
+| 2026-11-09 | 19:37:53 | 19:43:57 | 6m 04s | Coder | Fase 5: Bike push/stun/modifiers, abilities, botsingen, AI gebruikt knoppen volgens contract 08 B-E |

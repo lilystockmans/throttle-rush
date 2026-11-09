@@ -1,6 +1,6 @@
 // De drie moto-silhouetten: sport, cross en cruiser (extra bestand naast BikeModel.js).
 // Elke functie vult een lijst met onderdelen (zie bikeParts.js) en geeft de
-// wiel-afmetingen terug. Coordinaten: x = links/rechts, y = omhoog,
+// wiel-afmetingen en de uitlaatmond (exhaust, voor de turbovlam) terug. Coordinaten: x = links/rechts, y = omhoog,
 // z = voor/achter. De VOORKANT is -Z, de grond is y = 0.
 // Slots: paint (kuip/tank/spatbord), metal, seat, tire, riderSuit, helmetVisor.
 import { addBox, addSphere, addLimb, addRider, spiegel } from "./bikeParts.js";
@@ -23,7 +23,7 @@ function buildSport(parts) {
     elbow: [0.27, 0.92, -0.12], hand: [0.2, 0.88, -0.38],
     knee: [0.21, 0.72, 0.02], foot: [0.2, 0.42, 0.25],
   });
-  return { wheelRadius: R, wheelbase: wb, tireWidth: 0.16, tireSegments: 12 };
+  return { wheelRadius: R, wheelbase: wb, tireWidth: 0.16, tireSegments: 12, exhaust: [0.15, 0.4, 0.97] };
 }
 
 // CROSS: hoog, smal, lange vering, groot voorspatbord, rijder rechtop.
@@ -49,7 +49,7 @@ function buildCross(parts) {
     knee: [0.22, 0.95, -0.05], foot: [0.22, 0.5, 0.15],
   });
   addBox(parts, "paint", [0.2, 0.02, 0.16], [0, 1.89, -0.12]); // klep van de helm
-  return { wheelRadius: R, wheelbase: wb, tireWidth: 0.13, tireSegments: 10 };
+  return { wheelRadius: R, wheelbase: wb, tireWidth: 0.13, tireSegments: 10, exhaust: [0.16, 0.98, 0.78] };
 }
 
 // CRUISER: lang en laag, brede stuur naar achter, rijder achterover met voeten vooruit.
@@ -75,7 +75,7 @@ function buildCruiser(parts) {
     elbow: [0.4, 1.12, 0.22], hand: [0.4, 1.05, 0.0],
     knee: [0.26, 0.7, -0.2], foot: [0.28, 0.38, -0.5],
   });
-  return { wheelRadius: R, wheelbase: wb, tireWidth: 0.2, tireSegments: 12 };
+  return { wheelRadius: R, wheelbase: wb, tireWidth: 0.2, tireSegments: 12, exhaust: [0.22, 0.3, 0.9] };
 }
 
 export const SHAPE_BUILDERS = { sport: buildSport, cross: buildCross, cruiser: buildCruiser };

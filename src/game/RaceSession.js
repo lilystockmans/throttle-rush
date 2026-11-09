@@ -7,7 +7,12 @@ import { BIKE_TYPES } from "../bikes/bikeTypes.js";
 import { OPPONENTS } from "../race/opponents.js";
 import { RaceManager } from "../race/RaceManager.js";
 import { AIDriver } from "../race/AIDriver.js";
+import { createAbility } from "../bikes/abilities.js";
+import { resolveCollisions } from "../bikes/collisions.js";
 import { Rider } from "./Rider.js";
+
+// Naam van de speciale knop zoals de speler hem ziet.
+const ABILITY_NAMES = { turbo: "Turbo", offroad: "Offroad-boost", shove: "Zijduw" };
 
 // Geen gas, geen sturen: tijdens het aftellen staat iedereen stil.
 const NO_CONTROLS = { throttle: 0, brake: 0, steer: 0, action: false, reset: false };
@@ -42,8 +47,17 @@ export class RaceSession {
 
   // Voeg een rijder toe aan onze lijst én aan de race.
   register(entry) {
+    // Elke rijder krijgt zijn eigen speciale knop (turbo, offroad-boost of zijduw).
+    entry.ability = createAbility(entry.rider.bike);
+    entry.ability.onUse = (info) => this.onAbilityUsed(entry, info);
     this.riders.push(entry);
     this.race.addRider(entry.id, entry.rider.bike);
+  }
+
+  // Wordt de speler opzij geduwd door een cruiser? Laat het hem weten.
+  onAbilityUsed(entry, info) {
+    if (info.target === this.player.bike) this.hud.flashHit(`${entry.name}: zijduw!`);
+    else if (entry.id === "player" && info.target) this.hud.flashHit("Raak!");
   }
 
   addOpponents() {
@@ -74,18 +88,29 @@ export class RaceSession {
     this.race.start();
   }
 
-  // Elke fysica-stap: iedereen krijgt zijn besturing, daarna telt de race.
+  // Elke fysica-stap, in deze volgorde:
+  // 1. besturing kiezen, 2. speciale knop, 3. moto bewegen, 4. botsingen oplossen, 5. race tellen.
   update(dt, playerControls) {
     const canMove = this.race.canMove();
+    const bikes = this.riders.map((r) => r.rider.bike);
     for (const r of this.riders) {
-      const done = this.race.getRider(r.id).finished;
-      let controls = NO_CONTROLS;
-      if (canMove && r.ai) controls = r.ai.getControls();
-      else if (canMove && !done) controls = playerControls;
-      else if (canMove && done) controls = this.autopilot().getControls(); // speler na de finish
-      r.rider.bike.update(dt, controls);
+      const bike = r.rider.bike;
+      const others = bikes.filter((b) => b !== bike);
+      const controls = canMove ? this.controlsFor(r, playerControls, others) : NO_CONTROLS;
+      // Tijdens het aftellen slaan we de knop over. Anders lijkt een spatie die nog vastzit
+      // van het menu "losgelaten" en vuurt hij bij GO meteen af.
+      if (canMove) r.ability.update(dt, controls.action, others);
+      bike.update(dt, controls);
     }
+    if (canMove) resolveCollisions(bikes);
     this.race.update(dt);
+  }
+
+  // Wie stuurt deze moto? De computer, de speler, of (na de finish) de autopiloot.
+  controlsFor(r, playerControls, others) {
+    if (r.ai) return r.ai.getControls(others);
+    if (!this.race.getRider(r.id).finished) return playerControls;
+    return this.autopilot().getControls(others);
   }
 
   // Na de finish neemt een computer-bestuurder het stuur van de speler over.
@@ -100,7 +125,11 @@ export class RaceSession {
 
   // Elk beeld: modellen volgen de fysica, interface bijwerken.
   render(dt) {
-    for (const r of this.riders) r.rider.syncModel(dt);
+    for (const r of this.riders) {
+      r.rider.syncModel(dt);
+      r.rider.showFlame(r.ability.state.active && r.ability.state.kind === "turbo");
+    }
+    this.updateAbilityMeter();
     const me = this.race.getRider("player");
     this.hud.setSpeed(this.player.bike.speed * 3.6); // m/s naar km/u
     this.hud.setSurface(this.player.bike.surface);
@@ -114,6 +143,13 @@ export class RaceSession {
       this.standingsTimer = 0.5;
       this.raceUI.updateStandings(this.buildStandings());
     }
+  }
+
+  // Meter van de speciale knop: hoeveel van de afkoeltijd is voorbij (0..1)?
+  updateAbilityMeter() {
+    const s = this.riders[0].ability.state;
+    const fraction = s.cooldownTotal > 0 ? 1 - s.cooldownLeft / s.cooldownTotal : 1;
+    this.hud.setAbility({ name: ABILITY_NAMES[s.kind], ready: s.ready, active: s.active, fraction });
   }
 
   // Lijst voor het finish-scherm, eerste plaats eerst.

@@ -4,6 +4,7 @@
 // krijgt alleen nieuwe meshes met de gedeelde geometrie en eigen kleur.
 import * as THREE from "three";
 import { SHAPE_BUILDERS } from "./bikeShapes.js";
+import { createBoostFlame } from "./boostFlame.js";
 import { mergeParts, buildWheelGeometries } from "./bikeParts.js";
 
 // Slot in de geometrie -> sleutel in het materials-object. "paint" kleurt per moto.
@@ -63,6 +64,9 @@ export function createBikeModel({ type, color, materials }) {
   const halfBase = shared.spec.wheelbase / 2;
   leanPivot.add(makeWheel("wheelFront", shared, materials, -halfBase)); // voor = -Z
   leanPivot.add(makeWheel("wheelBack", shared, materials, halfBase));
+
+  // Turbovlam bij de uitlaat: onder leanPivot (helt mee), standaard onzichtbaar.
+  leanPivot.add(createBoostFlame(materials, shared.spec.exhaust));
 
   model.userData.wheelRadius = shared.spec.wheelRadius;
   return model;

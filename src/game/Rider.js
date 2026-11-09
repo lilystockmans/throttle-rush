@@ -13,6 +13,7 @@ export class Rider {
     this.leanPivot = this.model.getObjectByName("leanPivot");
     this.wheelFront = this.model.getObjectByName("wheelFront");
     this.wheelBack = this.model.getObjectByName("wheelBack");
+    this.flame = this.model.getObjectByName("boostFlame");
     this.scene = scene;
     scene.add(this.model);
   }
@@ -33,6 +34,12 @@ export class Rider {
     const spin = (bike.speed * dt) / model.userData.wheelRadius;
     this.wheelFront.rotation.x -= spin;
     this.wheelBack.rotation.x -= spin;
+  }
+
+  // Turbovlam aan of uit. Een beetje flakkeren in lengte maakt hem levendig.
+  showFlame(on) {
+    this.flame.visible = on;
+    if (on) this.flame.scale.z = 0.8 + Math.random() * 0.5;
   }
 
   remove() {

@@ -21,6 +21,13 @@ export const METAL = 0xb4bdc8;
 export const SEAT = 0x2e2a3a;
 export const RIDER_SUIT = 0x2f6df0;
 export const HELMET_VISOR = 0x22d3e6;
+// Turbovlam: oranje-geel buitenkant, bijna witte kern. Felle, verzadigde kleuren
+// zodat de vlam overdag opvalt tegen donker asfalt en blauwe lucht.
+export const FLAME_OUTER = 0xff9a1f;
+export const FLAME_CORE = 0xfff6c8;
+// Doorzichtigheid van de vlam (kern iets dichter, zodat het midden wit blijft).
+const FLAME_OPACITY = 0.85;
+const FLAME_CORE_OPACITY = 0.95;
 
 // De 3 lichttinten (0 = donker, 1 = helemaal verlicht).
 // Laagste tint niet te donker: schaduw moet kleurrijk blijven, geen zwart.
@@ -55,6 +62,20 @@ export function createMaterials() {
     return paintCache.get(key);
   }
 
+  // Vlammen: MeshBasicMaterial reageert niet op licht of schaduw, dus ze gloeien altijd even fel.
+  // Bewust NormalBlending en geen AdditiveBlending: additive telt kleur bij de achtergrond op,
+  // en tegen lichte lucht of een lichte weg klipt dat naar wit, waardoor de vlam wegvalt.
+  // Normale blending houdt het oranje overal zichtbaar. depthWrite uit: doorzichtig, geen sorteerfouten.
+  // toneMapped uit: de kleuren blijven precies zoals in het palet.
+  const glow = (color, opacity) =>
+    new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+      toneMapped: false,
+    });
+
   return {
     road: toon(ASPHALT),
     roadLine: toon(ROAD_LINE),
@@ -70,6 +91,8 @@ export function createMaterials() {
     seat: toon(SEAT),
     riderSuit: toon(RIDER_SUIT),
     helmetVisor: toon(HELMET_VISOR),
+    flame: glow(FLAME_OUTER, FLAME_OPACITY),
+    flameCore: glow(FLAME_CORE, FLAME_CORE_OPACITY),
     paint,
   };
 }

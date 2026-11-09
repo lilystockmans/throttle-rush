@@ -1,16 +1,18 @@
 // AIDriver.js: de computer-bestuurder. Hij "drukt toetsen" voor één moto: elke fysica-stap geeft
 // getControls() { throttle, brake, steer, action, reset }, net als het toetsenbord.
 //
-// Zo denkt hij, in drie stappen:
+// Zo denkt hij, in vier stappen:
 // 1. Vooruitkijken: hij loopt langs de voorbemonsterde baan tot 80 m vooruit. Het punt op
 //    ongeveer 6 m + 0,45 s rijden vooruit is zijn stuurdoel (hoe sneller, hoe verder kijken).
 // 2. Sturen: hoek tussen zijn neus en het stuurdoel = fout. Stuur = -gain x fout (rechts = -).
 // 3. Snelheid: per stukje baan schat hij de bochtstraal en rekent uit hoe hard de moto daar nog
-//    om kan (stuurkracht neemt af met snelheid, zoals in Bike.js). Hij moet eerder remmen
-//    als de bocht verder weg ligt, dus tel remafstand mee. skill maakt het allemaal trager.
-// Een cross-rijder (useShortcut) neemt het dirt-pad zodra hij vlak voor het begin is. De
-// lookahead loopt dan vanzelf het pad in en na het pad weer de baan op.
+//    om kan (stuurkracht neemt af met snelheid, zoals in Bike.js). Hij remt eerder als de bocht
+//    verder weg ligt (remafstand). skill maakt het trager; boost-modifiers tellen mee.
+// 4. Speciale knop: createButtonPresser (abilities.js) beslist of het een goed moment is.
+// Een cross-rijder (useShortcut) neemt het dirt-pad zodra hij vlak voor het begin is; de
+// lookahead loopt dan vanzelf het pad in en erna weer de baan op.
 import { CONFIG } from "../config.js";
+import { createButtonPresser } from "../bikes/abilities.js";
 import { headingFromTangent } from "../world/Track.js";
 
 const FRAME_SPACING = 2;        // m tussen voorbemonsterde punten
@@ -26,19 +28,16 @@ const ENTRY_DISTANCE = 25;      // m voor het begin van het pad: afslaan naar de
 const WOBBLE_AMPLITUDE = 1;     // m schommeling van de lijn
 const WOBBLE_SPEED = 0.35;      // rad/s: traag
 const WOBBLE_PHASE_STEP = 2.4;  // elke rijder een andere fase
-const STUCK_SPEED = 2;          // m/s: trager dan dit, langer dan STUCK_SECONDS = vastgereden
-const STUCK_SECONDS = 2;
+const STUCK_SPEED = 2;          // m/s: trager dan dit...
+const STUCK_SECONDS = 2;        // ...langer dan dit = vastgereden
 const OFF_TRACK_DISTANCE = 25;  // m naast de middenlijn = verdwaald
+const PATH_START_FRAMES = 3;    // zo kort op het pad telt als "begin van de shortcut"
 let nextPhase = 0;
 const routeCache = new WeakMap();   // frames en bochten per circuit maar één keer uitrekenen
 
 export class AIDriver {
   constructor({ track, bike, skill, line, useShortcut }) {
-    this.track = track;
-    this.bike = bike;
-    this.skill = skill;
-    this.line = line;
-    this.useShortcut = useShortcut;
+    Object.assign(this, { track, bike, skill, line, useShortcut });
     this.routes = getRoutes(track);
     this.phase = (nextPhase += WOBBLE_PHASE_STEP);   // per rijder een andere golf
     this.clock = 0;
@@ -47,18 +46,20 @@ export class AIDriver {
     this.cursor = { onPath: false, i: 0 };   // loopt vooruit tijdens het kijken
     this.stuckTime = 0;
     this.target = { x: 0, z: 0 };   // stuurdoel, wordt elke stap bijgewerkt
+    this.situation = { curveAhead: 0, startingShortcut: false };   // wat de knop-logica moet weten
+    this.pressButton = createButtonPresser(bike);
   }
 
-  getControls() {
+  getControls(others = []) {
     this.clock += CONFIG.physicsStep;
-    const lateral = this.locate();
-    if (this.isLost(lateral)) return this.resetControls();
+    if (this.isLost(this.locate())) return this.resetControls();
     const speedLimit = this.scanAhead();
+    this.situation.startingShortcut = this.onPath && this.index <= PATH_START_FRAMES;
     return {
       throttle: this.bike.speed < speedLimit ? 1 : 0,
       brake: this.bike.speed > speedLimit + BRAKE_TOLERANCE ? 1 : 0,
       steer: this.steerToTarget(),
-      action: false,
+      action: this.pressButton(this.clock, this.situation, others),
       reset: false,
     };
   }
@@ -77,8 +78,10 @@ export class AIDriver {
       if (this.onPath) return 0;      // op het pad zijn we per definitie "op de route"
     }
     const near = this.track.getNearest(x, z);
-    this.index = Math.round(near.t * this.routes.loop.count) % this.routes.loop.count;
-    if (this.useShortcut && this.isNearPathStart()) { this.onPath = true; this.index = 0; }
+    const { loop, entryIndex } = this.routes;
+    this.index = Math.round(near.t * loop.count) % loop.count;
+    const framesToEntry = (entryIndex - this.index + loop.count) % loop.count;
+    if (this.useShortcut && framesToEntry <= ENTRY_DISTANCE / loop.spacing) { this.onPath = true; this.index = 0; }
     return near.lateral;
   }
 
@@ -95,16 +98,10 @@ export class AIDriver {
     if (best >= frames.length - 2) this.onPath = false;   // einde: terug naar baanvolgen
   }
 
-  isNearPathStart() {
-    const { loop, entryIndex } = this.routes;
-    return (entryIndex - this.index + loop.count) % loop.count <= ENTRY_DISTANCE / loop.spacing;
-  }
-
   // ---------- Verdwaald of vast? ----------
   isLost(lateral) {
     this.stuckTime = Math.abs(this.bike.speed) < STUCK_SPEED ? this.stuckTime + CONFIG.physicsStep : 0;
-    const farAway = !this.onPath && Math.abs(lateral) > OFF_TRACK_DISTANCE;
-    return this.stuckTime > STUCK_SECONDS || farAway;
+    return this.stuckTime > STUCK_SECONDS || (!this.onPath && Math.abs(lateral) > OFF_TRACK_DISTANCE);
   }
 
   // Bike negeert reset boven resetBelowSpeed. Daarom blijft de AI dan vol remmen tot het mag.
@@ -120,15 +117,17 @@ export class AIDriver {
   scanAhead() {
     const { bike, cursor } = this;
     const lookDistance = LOOK_BASE + LOOK_TIME * Math.abs(bike.speed);
-    cursor.onPath = this.onPath;
-    cursor.i = this.index;
+    Object.assign(cursor, { onPath: this.onPath, i: this.index });
     let allowed = Infinity;
+    let sharpest = 0;      // scherpste kromming die we zien (voor de knop-logica)
     let targetSet = false;
     for (let s = 0; s <= PLAN_DISTANCE; s += this.stepForward()) {
       const route = cursor.onPath ? this.routes.path : this.routes.loop;
       allowed = Math.min(allowed, this.allowedSpeedAt(route, cursor.i, s));
+      sharpest = Math.max(sharpest, Math.abs(route.curvature[cursor.i]));
       if (!targetSet && s >= lookDistance) { this.setTarget(route, cursor.i); targetSet = true; }
     }
+    this.situation.curveAhead = sharpest;
     return this.skill * allowed;
   }
 
@@ -154,10 +153,19 @@ export class AIDriver {
 
   // Hoe hard mag ik nú, om over s meter dit punt nog met de juiste snelheid te halen?
   allowedSpeedAt(route, i, s) {
-    const ground = this.bike.type.surface[route === this.routes.path ? "dirt" : "road"];
-    const safeHere = Math.min(this.bike.type.topSpeed * ground.speed, this.cornerSpeed(route, i, ground.grip));
+    const { type, modifiers } = this.bike;
+    const safeHere = Math.min(type.topSpeed * modifiers.topSpeed * this.groundFactor(route, "speed"),
+      this.cornerSpeed(route, i, this.groundFactor(route, "grip")));
     const brakeRoom = 2 * this.bike.type.braking * BRAKE_USE * s;   // v^2 = v0^2 + 2 a s
     return Math.sqrt(safeHere * safeHere + brakeRoom);
+  }
+
+  // Speed- of grip-factor van de ondergrond op deze route. Op het pad rekenen we met dirt, maar
+  // met de offroad-boost schuift dat richting asfalt (zelfde som als effectiveGround in Bike.js).
+  groundFactor(route, key) {
+    const { surface } = this.bike.type;
+    if (route !== this.routes.path) return surface.road[key];
+    return surface.dirt[key] + (surface.road[key] - surface.dirt[key]) * this.bike.modifiers.offroad;
   }
 
   // Hoogste snelheid waarop de stuurkracht nog genoeg is voor deze bocht.
@@ -194,12 +202,8 @@ function getRoutes(track) {
   if (routeCache.has(track)) return routeCache.get(track);
   const loop = buildRoute(track.sampleFrames(Math.round(track.length / FRAME_SPACING)), true);
   const path = buildRoute(track.sampleShortcutFrames(pathFrameCount(track)), false);
-  const routes = {
-    loop,
-    path,
-    entryIndex: loopIndexOf(track, loop, path.frames[0]),
-    exitIndex: loopIndexOf(track, loop, path.frames[path.frames.length - 1]),
-  };
+  const [first, last] = [path.frames[0], path.frames[path.frames.length - 1]];
+  const routes = { loop, path, entryIndex: loopIndexOf(track, loop, first), exitIndex: loopIndexOf(track, loop, last) };
   routeCache.set(track, routes);
   return routes;
 }
@@ -217,8 +221,7 @@ function loopIndexOf(track, loop, frame) {
 
 function chordLength(frames, closed) {
   let total = 0;
-  const segments = closed ? frames.length : frames.length - 1;
-  for (let i = 0; i < segments; i++) {
+  for (let i = 0; i < (closed ? frames.length : frames.length - 1); i++) {
     total += frames[i].position.distanceTo(frames[(i + 1) % frames.length].position);
   }
   return total;

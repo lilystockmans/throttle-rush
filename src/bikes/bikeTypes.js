@@ -22,9 +22,9 @@ export const BIKE_TYPES = {
     },
     ability: {
       kind: "turbo",
-      cooldown: 8,             // s wachttijd na gebruik
-      duration: 1.5,           // s dat de turbo aanstaat
-      strength: 1.25,          // factor op topSpeed en optrekken tijdens de turbo
+      cooldown: 10,            // s wachttijd na gebruik: ca. 3 keer per ronde, dus bewaren voor de rechte stukken
+      duration: 1.2,           // s dat de turbo aanstaat: kort en krachtig, geen permanente voorsprong
+      strength: 1.25,          // factor op topSpeed en optrekken tijdens de turbo (42 wordt 52,5 m/s = 189 km/u)
     },
   },
 
@@ -47,8 +47,8 @@ export const BIKE_TYPES = {
     },
     ability: {
       kind: "offroad",
-      cooldown: 10,            // s wachttijd na gebruik
-      duration: 3,             // s dat de offroad-boost aanstaat
+      cooldown: 11,            // s wachttijd na gebruik: ca. 2 keer per ronde (eens voor de shortcut, eens voor een afsnijding)
+      duration: 4,             // s dat de offroad-boost aanstaat: dekt de hele dirt-shortcut
       strength: 1.0,           // 0 tot 1: hoeveel van het verlies op gras en dirt wordt weggehaald (1 = alles)
     },
   },
@@ -57,8 +57,8 @@ export const BIKE_TYPES = {
   cruiser: {
     label: "Zwaargewicht",
     color: 0xffb400,           // goudgeel
-    topSpeed: 39.5,            // m/s op asfalt (= 142 km/u)
-    acceleration: 14,          // m/s2 bij vol gas (traag op gang)
+    topSpeed: 40.5,            // m/s op asfalt (= 146 km/u), nog steeds onder sport (42) en boven cross (37,5)
+    acceleration: 15,          // m/s2 bij vol gas (nog steeds het traagst op gang: sport 16, cross 20)
     braking: 24,               // m/s2 bij vol remmen
     turnRate: 1.7,             // rad/s sturen bij lage snelheid
     turnRateAtTop: 0.75,       // rad/s sturen bij topsnelheid
@@ -72,9 +72,9 @@ export const BIKE_TYPES = {
     },
     ability: {
       kind: "shove",
-      cooldown: 6,             // s wachttijd na gebruik
+      cooldown: 8,             // s wachttijd na gebruik: ca. 3 tot 4 keer per ronde, als er iemand naast je rijdt
       duration: 0.4,           // s dat de duw duurt
-      strength: 12,            // m/s zijwaartse duwsnelheid die een tegenstander in de zij krijgt
+      strength: 16,            // m/s zijwaartse duwsnelheid; bij pushDecay 4 schuift het slachtoffer ca. 4 m opzij (de helft van een rijstrook)
     },
   },
 };
