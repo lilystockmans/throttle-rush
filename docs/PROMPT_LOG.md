@@ -30,3 +30,4 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 19:25:54 | 19:26:42 | 0m 48s | Game designer | Fase 4: vijf tegenstanders (naam, type, kleur, skill, lijn, shortcut) volgens contract 07-A |
 | 2026-11-09 | 19:25:54 | 19:27:13 | 1m 19s | UX/UI-specialist | Fase 4: klassement op het finish-scherm, updateStandings volgens contract 07-C |
 | 2026-11-09 | 19:25:54 | 19:29:50 | 3m 56s | Coder | Fase 4: AIDriver (baan volgen, remmen voor bochten, shortcut, reset) volgens contract 07-B |
+| 2026-11-09 | 19:36:07 | 19:37:00 | 0m 53s | Lily | also add a kort en krachtig readme.md |
