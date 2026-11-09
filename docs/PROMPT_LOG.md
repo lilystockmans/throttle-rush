@@ -8,3 +8,4 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | ~15:08 | - | (handmatig, plan-feedback binnen dezelfde beurt) | Lily | maak vershcillende agents voor de verschillende vakken die niet naar elkaars werk kunnen kijken, dus bijvoorbeeld designer, coding, 3d, shading, user friendly, enz. |
 | 2026-11-09 | ~15:09 | - | (handmatig, tussendoor gestuurd) | Lily | hoe ook een logboek bij van de prompts en hoe lang elke duurt. de output moet niet bijgehouden worden |
 | 2026-11-09 | ~15:31 | 15:36 | ~5m (handmatig, haken actief vanaf volgende sessie) | Lily | Ja, publiceer |
+| 2026-11-09 | 15:17:11 | 15:18:41 | 1m 29s | Lily | Ja, publiceer |
