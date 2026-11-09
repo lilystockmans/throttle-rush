@@ -70,5 +70,10 @@ export function createHUD() {
       ondergrond.textContent = SURFACE_NAMES[surface] || String(surface);
       ondergrond.dataset.surface = surface;
     },
+
+    // true = snelheidsmeter tonen, false = verbergen (bijvoorbeeld tijdens het keuzemenu)
+    setVisible(zichtbaar) {
+      root.classList.toggle("is-hidden", !zichtbaar);
+    },
   };
 }

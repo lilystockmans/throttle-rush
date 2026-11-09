@@ -32,8 +32,8 @@ export const BIKE_TYPES = {
   cross: {
     label: "Modderrat",
     color: 0x16c4d8,           // helder turquoise (contrasteert met rood en oranje)
-    topSpeed: 36,              // m/s op asfalt (= 130 km/u)
-    acceleration: 18,          // m/s2 bij vol gas (licht, dus pittig)
+    topSpeed: 37.5,            // m/s op asfalt (= 135 km/u)
+    acceleration: 20,          // m/s2 bij vol gas (licht, dus pittig)
     braking: 28,               // m/s2 bij vol remmen
     turnRate: 2.9,             // rad/s sturen bij lage snelheid
     turnRateAtTop: 1.35,       // rad/s sturen bij topsnelheid
@@ -42,7 +42,7 @@ export const BIKE_TYPES = {
     surface: {
       road:  { speed: 1.0,  grip: 1.0 },   // asfalt: normaal
       curb:  { speed: 0.97, grip: 0.95 },  // berm: nauwelijks last
-      dirt:  { speed: 0.92, grip: 0.92 },  // dirt: thuiswedstrijd, nauwelijks verlies
+      dirt:  { speed: 0.95, grip: 0.95 },  // dirt: thuiswedstrijd, nauwelijks verlies
       grass: { speed: 0.9,  grip: 0.85 },  // gras: ook prima (iets trager dan dirt)
     },
     ability: {
@@ -57,8 +57,8 @@ export const BIKE_TYPES = {
   cruiser: {
     label: "Zwaargewicht",
     color: 0xffb400,           // goudgeel
-    topSpeed: 38,              // m/s op asfalt (= 137 km/u)
-    acceleration: 12,          // m/s2 bij vol gas (traag op gang)
+    topSpeed: 39.5,            // m/s op asfalt (= 142 km/u)
+    acceleration: 14,          // m/s2 bij vol gas (traag op gang)
     braking: 24,               // m/s2 bij vol remmen
     turnRate: 1.7,             // rad/s sturen bij lage snelheid
     turnRateAtTop: 0.75,       // rad/s sturen bij topsnelheid

@@ -1,4 +1,4 @@
-/* Stijl van de interface boven het 3D-canvas: snelheidsmeter (HUD) en besturingshulp.
+/* Stijl van de interface boven het 3D-canvas: snelheidsmeter (HUD), besturingshulp en keuzemenu.
    Alle kleuren staan bovenaan als variabelen, zodat je ze op één plek kunt aanpassen. */
 
 :root {
@@ -21,10 +21,11 @@
   --font-display: "Lilita One", "Arial Rounded MT Bold", system-ui, sans-serif;
   --font-text: "Nunito", system-ui, sans-serif;
 
-  /* Maten en tempo */
+  /* Maten en tempo (op kleine schermen worden ze onderaan kleiner gezet) */
   --ui-gap: 24px;
   --ui-radius: 18px;
   --ui-fade: 0.6s;
+  --hud-w: 230px;
 }
 
 /* Laag over het hele scherm. Muisklikken gaan door naar het canvas. */
@@ -44,7 +45,7 @@
   position: absolute;
   right: var(--ui-gap);
   bottom: var(--ui-gap);
-  width: 230px;                 /* vaste breedte: het paneel springt niet bij 9 -> 10 -> 100 */
+  width: var(--hud-w);          /* vaste breedte: het paneel springt niet bij 9 -> 10 -> 100 */
   padding: 10px 18px 12px;
   box-sizing: border-box;
   text-align: right;
@@ -53,13 +54,9 @@
   border-radius: var(--ui-radius);
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
 }
+.hud.is-hidden { display: none; }   /* hud.setVisible(false) */
 
-.hud__speed {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 8px;
-}
+.hud__speed { display: flex; align-items: baseline; justify-content: flex-end; gap: 8px; }
 
 .hud__value {
   display: inline-block;
@@ -72,12 +69,7 @@
   text-shadow: 0 3px 0 var(--ui-ink), 0 0 10px rgba(27, 34, 80, 0.6);
 }
 
-.hud__unit {
-  font-family: var(--font-display);
-  font-size: 24px;
-  color: var(--ui-text);
-  text-shadow: 0 2px 0 var(--ui-ink);
-}
+.hud__unit { font-family: var(--font-display); font-size: 24px; color: var(--ui-text); text-shadow: 0 2px 0 var(--ui-ink); }
 
 /* Achteruit: getal wordt koraalrood */
 .hud.is-reverse { border-color: var(--ui-accent-2); }
@@ -106,7 +98,10 @@
   position: absolute;
   left: var(--ui-gap);
   bottom: var(--ui-gap);
+  /* nooit breder dan de ruimte tussen de rand en de snelheidsmeter: dan overlappen ze niet */
+  max-width: calc(100vw - 3 * var(--ui-gap) - var(--hud-w));
   padding: 14px 18px;
+  box-sizing: border-box;
   background: var(--ui-panel);
   border: 3px solid var(--ui-accent);
   border-radius: var(--ui-radius);
@@ -117,21 +112,13 @@
 }
 
 /* Klasse die controlsHint.js toevoegt vlak voor het verwijderen */
-.hint.is-hiding {
-  opacity: 0;
-  transform: translateY(12px);
-}
+.hint.is-hiding { opacity: 0; transform: translateY(12px); }
 
-.hint__title {
-  margin: 0 0 8px;
-  font-family: var(--font-display);
-  font-size: 20px;
-  font-weight: normal;
-  color: var(--ui-accent);
-}
+.hint__title { margin: 0 0 8px; font-family: var(--font-display); font-size: 20px; font-weight: normal; color: var(--ui-accent); }
 
 .hint__row {
   display: flex;
+  flex-wrap: wrap;              /* te smal? dan zakt de uitleg naar een tweede regel */
   align-items: center;
   gap: 6px;
   margin-top: 6px;
@@ -139,7 +126,6 @@
   font-size: 15px;
   text-shadow: 0 1px 0 var(--ui-ink);
 }
-
 .hint__label { margin-left: 6px; }
 .hint__or { opacity: 0.7; font-size: 13px; }
 
@@ -161,8 +147,88 @@
   box-shadow: 0 0 0 1px var(--ui-keycap-edge) inset;
 }
 
-/* Wie liever minder beweging heeft: geen schuivende overgang, alleen kort vervagen */
+/* ---------- Keuzemenu (BikeMenu.js) ---------- */
+
+/* Dicht = weg. Open = vult het scherm. De achtergrond is alleen boven (titel) en onder
+   (kaarten) donker; het midden blijft helder zodat je de draaiende moto goed ziet. */
+.menu { display: none; position: absolute; inset: 0; box-sizing: border-box; flex-direction: column; justify-content: space-between;
+  padding: var(--ui-gap); pointer-events: auto; text-align: center;
+  background: linear-gradient(to bottom, rgba(27, 34, 80, 0.6) 0, rgba(27, 34, 80, 0) 22%, rgba(27, 34, 80, 0) 45%, rgba(27, 34, 80, 0.78) 100%); }
+.menu.is-open { display: flex; }
+
+.menu__title { margin: 0; font-family: var(--font-display); font-size: 64px; font-weight: normal; line-height: 1;
+  color: var(--ui-accent); text-shadow: 0 4px 0 var(--ui-ink), 0 0 16px rgba(27, 34, 80, 0.7); }
+.menu__subtitle { margin: 6px 0 0; font-weight: 800; font-size: 20px; text-shadow: 0 2px 0 var(--ui-ink); }
+
+.menu__bottom { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.menu__cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: end;
+  width: 100%; max-width: 940px; padding-top: 14px; /* ruimte voor de opgetilde kaart */ }
+
+/* Kaart: --kleur wordt door BikeMenu.js op de motokleur gezet */
+.card { --kleur: var(--ui-accent); overflow: hidden; cursor: pointer; text-align: left;
+  background: var(--ui-panel); border: 4px solid rgba(255, 255, 255, 0.25); border-radius: var(--ui-radius);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25); opacity: 0.82;
+  transition: transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+.card:hover { opacity: 1; }
+.card.is-selected { opacity: 1; transform: translateY(-12px) scale(1.06); border-color: var(--kleur);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25), 0 0 28px var(--kleur); }
+.card__band { height: 16px; background: var(--kleur); }
+.card__body { padding: 10px 14px 14px; }
+.card__name { margin: 0; font-family: var(--font-display); font-size: 28px; font-weight: normal; color: var(--kleur); text-shadow: 0 2px 0 var(--ui-ink); }
+.card__tip { margin: 4px 0 10px; min-height: 2.6em; font-weight: 700; font-size: 14px; line-height: 1.3; }
+
+.bar { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.bar__label { flex: 0 0 72px; font-weight: 800; font-size: 13px; }
+.bar__track { flex: 1; height: 10px; overflow: hidden; background: rgba(255, 255, 255, 0.18); border-radius: 999px; }
+.bar__fill { width: 0; height: 100%; background: var(--kleur); border-radius: 999px; transition: width 0.5s cubic-bezier(0.2, 0.9, 0.3, 1); }
+.card__ability { margin: 10px 0 0; font-size: 13px; font-weight: 700; }
+.card__ability strong { color: var(--ui-accent); }
+
+/* Startknop: pulseert zachtjes zodat de speler weet wat er moet gebeuren */
+.menu__start { padding: 6px 34px 8px; font-family: var(--font-display); font-size: 26px; cursor: pointer;
+  color: var(--ui-ink); background: var(--ui-accent); border: 3px solid var(--ui-ink); border-radius: 999px;
+  box-shadow: 0 5px 0 var(--ui-keycap-edge); animation: menu-pulse 1.2s ease-in-out infinite; }
+.menu__keys { margin: 0; font-weight: 800; font-size: 14px; text-shadow: 0 2px 0 var(--ui-ink); }
+@keyframes menu-pulse { 50% { transform: scale(1.06); } }
+
+/* ---------- Kleine schermen: smaller dan 1000 px of lager dan 650 px ---------- */
+@media (max-width: 999px), (max-height: 649px) {
+  :root { --ui-gap: 12px; --ui-radius: 14px; --hud-w: 160px; }
+  .hud { padding: 6px 12px 8px; }
+  .hud__value { font-size: 44px; }
+  .hud__unit { font-size: 16px; }
+  .hud__surface { font-size: 12px; margin-top: 2px; }
+  .hint { padding: 8px 12px; }
+  .hint__title { font-size: 16px; margin-bottom: 2px; }
+  .hint__row { font-size: 12px; margin-top: 4px; gap: 4px; }
+  .keycap { min-width: 20px; padding: 0 5px; font-size: 12px; }
+  .menu__title { font-size: 40px; }
+  .menu__subtitle { display: none; }
+  .menu__bottom { gap: 8px; }
+  .menu__cards { gap: 10px; padding-top: 12px; }
+  .card__band { height: 10px; }
+  .card__body { padding: 6px 10px 8px; }
+  .card__name { font-size: 20px; }
+  .card__tip { font-size: 12px; min-height: 0; margin-bottom: 6px; }
+  .bar { margin-top: 3px; gap: 6px; }
+  .bar__label { flex-basis: 58px; font-size: 11px; }
+  .bar__track { height: 7px; }
+  .card__ability { margin-top: 6px; font-size: 11px; }
+  .card.is-selected { transform: translateY(-8px) scale(1.04); }
+  .menu__start { padding: 3px 26px 5px; font-size: 20px; }
+  .menu__keys { font-size: 12px; }
+}
+/* Heel laag (zoals 768 x 500): de uitlegzin valt weg, anders is het midden te vol */
+@media (max-height: 560px) {
+  .card__tip { display: none; }
+}
+
+/* Wie liever minder beweging heeft: geen schuivende overgang, geen pulserende knop */
 @media (prefers-reduced-motion: reduce) {
   .hint { transition: opacity 0.2s linear; transform: none; }
   .hint.is-hiding { transform: none; }
+  .card, .card.is-selected { transition: none; }
+  .card.is-selected { transform: none; }
+  .bar__fill { transition: none; }
+  .menu__start { animation: none; }
 }

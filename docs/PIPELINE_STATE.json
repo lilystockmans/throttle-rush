@@ -24,13 +24,23 @@
         "tester-rapport docs/tests/fase1-tester.md",
         "Lily: sturen goed, gepubliceerd, live gecontroleerd 60 fps"
       ],
-      "open": [
-        "UI-panelen overlappen in vensters smaller dan ~1000 px (contract eiste pas vanaf 1280 px)"
-      ]
+      "open": []
     },
     "2": {
       "name": "Drie motortypes en ondergrond",
-      "status": "pending"
+      "status": "wacht op test van Lily",
+      "done": [
+        "contract 05 menu",
+        "keuzemenu met 3 kaarten, draaiende moto erboven",
+        "Esc terug naar menu",
+        "overlap kleine schermen opgelost (768x500 getest)",
+        "balans herzien met echte fysica: sport asfalt 29.7 s, cross shortcut 28.8 s (-3%), sport shortcut 34.7 s, cruiser 32.8 s (+10%)"
+      ],
+      "open": [
+        "FPS niet meetbaar in browserpaneel (paneel throttled tot 1 fps, ook fase 1 versie): Lily meet zelf",
+        "geen aparte tester-run deze fase",
+        "spatie bij start menu wordt ook als speciale knop gezien: oplossen in fase 5"
+      ]
     },
     "3": {
       "name": "Race-logica en HUD",
@@ -53,5 +63,5 @@
       "status": "pending"
     }
   },
-  "nextStep": "Fase 2: drie motortypes kiesbaar via menu, ondergrond-effect per type."
+  "nextStep": "Lily test fase 2. Daarna pushen, fase 3 (race-logica en HUD)."
 }

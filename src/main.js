@@ -1,5 +1,5 @@
 // Startpunt van de game: hier komen alle onderdelen samen.
-// Fase 1: één circuit, één sport-moto, chase-camera, snelheidsmeter.
+// Fase 2: keuzemenu met drie motortypes, daarna rijden. Esc = terug naar het menu.
 // Elk onderdeel komt van een andere specialist en volgt de contracten in docs/contracts/.
 
 import * as THREE from "three";
@@ -20,6 +20,7 @@ import { createFpsMeter } from "./core/Debug.js";
 import { ChaseCamera } from "./camera/ChaseCamera.js";
 import { createHUD } from "./ui/HUD.js";
 import { showControlsHint } from "./ui/controlsHint.js";
+import { createBikeMenu } from "./ui/BikeMenu.js";
 
 // --- Renderer en scène -------------------------------------------------
 // Pixel ratio begrenzen op 1.5: scherp genoeg, veel sneller op retina-schermen.
@@ -43,53 +44,106 @@ scene.add(buildTrackMesh(track, materials));
 scene.add(createProps(track, materials));
 
 // --- Speler ------------------------------------------------------------
-const bikeType = BIKE_TYPES.sport;
-const bike = new Bike(bikeType, track);
-bike.resetTo(track.getStartTransform(0));
+// "player" bundelt de fysica-moto (Bike) en het 3D-model dat haar volgt.
+let player = null;
 
-const model = createBikeModel({ type: "sport", color: bikeType.color, materials });
-const leanPivot = model.getObjectByName("leanPivot");
-const wheelFront = model.getObjectByName("wheelFront");
-const wheelBack = model.getObjectByName("wheelBack");
-scene.add(model);
+// Maak een nieuwe speler-moto van dit type op startplek 1 (midden voorste rij).
+function spawnPlayer(typeKey) {
+  if (player) scene.remove(player.model);
+  const type = BIKE_TYPES[typeKey];
+  const bike = new Bike(type, track);
+  bike.resetTo(track.getStartTransform(1));
+  const model = createBikeModel({ type: typeKey, color: type.color, materials });
+  scene.add(model);
+  player = {
+    typeKey, bike, model,
+    leanPivot: model.getObjectByName("leanPivot"),
+    wheelFront: model.getObjectByName("wheelFront"),
+    wheelBack: model.getObjectByName("wheelBack"),
+  };
+  syncModel(0);
+}
 
+// Zet het 3D-model op de plek van de fysica-moto.
+// De fysica (Bike) rekent, het model (BikeModel) volgt alleen.
+function syncModel(dt) {
+  const { bike, model } = player;
+  model.position.copy(bike.position);
+  model.rotation.y = bike.heading;
+  player.leanPivot.rotation.z = bike.lean;
+  // Wielen draaien: afgelegde afstand / straal = hoek. Negatief = vooruit rollen naar -Z.
+  const spin = (bike.speed * dt) / model.userData.wheelRadius;
+  player.wheelFront.rotation.x -= spin;
+  player.wheelBack.rotation.x -= spin;
+}
+
+// --- Camera's ----------------------------------------------------------
 const chase = new ChaseCamera(camera);
-chase.snapTo(bike);
+
+// In het menu draait de camera langzaam rond de gekozen moto.
+let orbitAngle = 0;
+function updateMenuCamera(dt) {
+  orbitAngle += dt * 0.35;
+  const p = player.model.position;
+  camera.position.set(p.x + Math.sin(orbitAngle) * 5, 1.5, p.z + Math.cos(orbitAngle) * 5);
+  // We kijken net ONDER de moto: zo staat ze hoger in beeld, boven de menukaarten.
+  camera.lookAt(p.x, -0.2, p.z);
+}
 
 // --- Interface ---------------------------------------------------------
 const input = createInput();
 const hud = createHUD();
 const fps = createFpsMeter();
-showControlsHint();
 
-// Alleen bij ?debug: maak de moto en het circuit bereikbaar vanuit de browserconsole (voor testen).
-if (new URLSearchParams(location.search).has("debug")) window.__game = { bike, track };
+const menu = createBikeMenu({
+  bikeTypes: BIKE_TYPES,
+  onHover: (key) => spawnPlayer(key),   // laat de moto zien die je bekijkt
+  onChoose: (key) => startRiding(key),
+});
 
-// Zet het 3D-model op de plek van de fysica-moto.
-// De fysica (Bike) rekent, het model (BikeModel) volgt alleen.
-function syncModel(dt) {
-  model.position.copy(bike.position);
-  model.rotation.y = bike.heading;
-  leanPivot.rotation.z = bike.lean;
-  // Wielen draaien: afgelegde afstand / straal = hoek. Negatief = vooruit rollen naar -Z.
-  const spin = (bike.speed * dt) / model.userData.wheelRadius;
-  wheelFront.rotation.x -= spin;
-  wheelBack.rotation.x -= spin;
+function openMenu() {
+  spawnPlayer(player ? player.typeKey : "sport");
+  hud.setVisible(false);
+  menu.show(player.typeKey);
+}
+
+function startRiding(typeKey) {
+  spawnPlayer(typeKey);
+  chase.snapTo(player.bike);
+  hud.setVisible(true);
+  showControlsHint();
+}
+
+// Esc tijdens het rijden = terug naar het menu.
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Escape" && !menu.isOpen()) openMenu();
+});
+
+openMenu();
+
+// Alleen bij ?debug: maak de game bereikbaar vanuit de browserconsole (voor testen).
+if (new URLSearchParams(location.search).has("debug")) {
+  window.__game = { track, get bike() { return player.bike; }, startRiding };
 }
 
 // --- Hoofdlus ----------------------------------------------------------
 startGameLoop({
   // Vaste stap: 60 keer per seconde, los van de beeldsnelheid.
+  // Zolang het menu open is, staat de moto stil en negeren we de toetsen.
   update(dt) {
-    bike.update(dt, input.read());
+    if (!menu.isOpen()) player.bike.update(dt, input.read());
   },
   // Eén keer per getekend beeld.
   render(dt) {
     syncModel(dt);
-    chase.update(dt, bike);
-    lights.follow(bike.position);
-    hud.setSpeed(bike.speed * 3.6); // m/s naar km/u
-    hud.setSurface(bike.surface);
+    if (menu.isOpen()) {
+      updateMenuCamera(dt);
+    } else {
+      chase.update(dt, player.bike);
+      hud.setSpeed(player.bike.speed * 3.6); // m/s naar km/u
+      hud.setSurface(player.bike.surface);
+    }
+    lights.follow(player.bike.position);
     renderer.render(scene, camera);
     fps.tick();
   },

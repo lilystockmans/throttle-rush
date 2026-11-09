@@ -1,7 +1,7 @@
 // controlsHint.js: klein paneel linksonder dat uitlegt welke toetsen je nodig hebt.
 // showControlsHint() zet het paneel in <div id="ui"> en laat het weer verdwijnen na 8 seconden
-// of zodra je de eerste toets indrukt (met een zachte fade). Daarna halen we het paneel uit de
-// pagina en ruimen we de toetsenbord-luisteraar en de timer op.
+// of zodra je een toets indrukt (met een zachte fade). Je mag de functie vaker aanroepen (na elke start):
+// een vorig paneel wordt dan eerst weggehaald, met zijn timers en toetsenbord-luisteraar.
 
 const ZICHTBAAR_MS = 8000; // hoe lang het paneel blijft staan als je niets indrukt
 const FADE_MS = 600;       // moet gelijk zijn aan --ui-fade in styles.css
@@ -11,7 +11,11 @@ const REGELS = [
   { toetsen: ["↑", "↓", "←", "→", "of", "W", "A", "S", "D"], label: "rijden" },
   { toetsen: ["Spatie"], label: "speciale knop" },
   { toetsen: ["R"], label: "terug op de baan" },
+  { toetsen: ["Esc"], label: "terug naar het menu" },
 ];
+
+// Het paneel dat nu in beeld is (of null). Hiermee ruimen we bij een nieuwe aanroep het oude op.
+let huidig = null;
 
 // Bouw één rij: toetsen als keycaps, daarna de uitleg
 function maakRij(regel) {
@@ -34,6 +38,9 @@ function maakRij(regel) {
 }
 
 export function showControlsHint() {
+  // Eerst het vorige paneel helemaal opruimen
+  if (huidig) huidig.ruimOp();
+
   // Bouw het paneel
   const paneel = document.createElement("div");
   paneel.className = "hint";
@@ -49,27 +56,40 @@ export function showControlsHint() {
 
   (document.getElementById("ui") || document.body).appendChild(paneel);
 
-  let timer = null;
+  let zichtTimer = null;   // timer voor "na 8 seconden"
+  let weghaalTimer = null; // timer die het paneel na de fade uit de pagina haalt
   let isBezigMetVerdwijnen = false;
 
-  // Haalt het paneel definitief weg
-  function verwijder() {
+  // Alles opruimen: paneel, beide timers en de luisteraar. Mag vaker aangeroepen worden.
+  function ruimOp() {
+    clearTimeout(zichtTimer);
+    clearTimeout(weghaalTimer);
+    window.removeEventListener("keydown", opToets);
     paneel.remove();
+    if (huidig === mijnHandle) huidig = null;
   }
 
-  // Start de fade en verwijder het paneel daarna. Mag vaker aangeroepen worden, doet het maar één keer.
+  // Start de fade en ruim daarna op. Doet het maar één keer.
   function verberg() {
     if (isBezigMetVerdwijnen) return;
     isBezigMetVerdwijnen = true;
 
-    // Opruimen: geen timer en geen luisteraar meer nodig
-    clearTimeout(timer);
-    window.removeEventListener("keydown", verberg);
-
+    clearTimeout(zichtTimer);
+    window.removeEventListener("keydown", opToets);
     paneel.classList.add("is-hiding"); // CSS doet de fade
-    setTimeout(verwijder, FADE_MS + 50); // iets langer dan de fade, dan uit de DOM
+    weghaalTimer = setTimeout(ruimOp, FADE_MS + 50); // iets langer dan de fade, dan uit de DOM
   }
 
-  window.addEventListener("keydown", verberg);
-  timer = setTimeout(verberg, ZICHTBAAR_MS);
+  // Elke eerste toets laat het paneel verdwijnen, behalve Enter en vasthouden (herhaling):
+  // Enter is vaak de toets waarmee het menu net gestart is.
+  function opToets(e) {
+    if (e.repeat || e.key === "Enter") return;
+    verberg();
+  }
+
+  const mijnHandle = { ruimOp };
+  huidig = mijnHandle;
+
+  window.addEventListener("keydown", opToets);
+  zichtTimer = setTimeout(verberg, ZICHTBAAR_MS);
 }

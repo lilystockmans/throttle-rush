@@ -17,3 +17,6 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 15:21:02 | 15:28:30 | ~7m 30s | Game designer | Fase 1: circuit (trackData), stats van drie motortypes, config, ontwerpnota volgens contract 01-A en 02 A-B |
 | 2026-11-09 | 15:30:10 | 15:38:34 | 8m 24s | Tester | Fase 1: speel de game als speler in de browser (geen code), test rijden, gras, reset, FPS, schrijf bevindingen in docs/tests/fase1-tester.md |
 | 2026-11-09 | 15:42:04 | 15:42:51 | 0m 48s | Lily | Goed, publiceer |
+| 2026-11-09 | 15:42:56 | 15:44:52 | 1m 57s | Lily | Ja, start fase 2 |
+| 2026-11-09 | 15:44:28 | 15:44:58 | 0m 30s | Game designer | Fase 2: herbalanceer bikeTypes op basis van gemeten rondetijden met de echte fysica (cross+shortcut moet 2-3% sneller zijn dan sport op asfalt) |
+| 2026-11-09 | 15:43:50 | 15:46:51 | 3m 01s | UX/UI-specialist | Fase 2: keuzemenu met drie moto-kaarten en stat-balken, HUD setVisible, Esc-regel in besturingsuitleg, kleine schermen volgens contract 05 |
