@@ -25,6 +25,7 @@ import { showControlsHint } from "./ui/controlsHint.js";
 import { createBikeMenu } from "./ui/BikeMenu.js";
 import { createRaceUI } from "./ui/RaceUI.js";
 import { createSoundToggle } from "./ui/soundToggle.js";
+import { createMinimap } from "./ui/Minimap.js";
 import { createAudio } from "./audio/AudioEngine.js";
 import { createDust } from "./world/dust.js";
 import { RaceEffects } from "./game/RaceEffects.js";
@@ -81,6 +82,14 @@ const fps = createFpsMeter();
 // Op een trage laptop gaat de kwaliteit vanzelf omlaag tot het vlot loopt.
 const quality = createAutoQuality(renderer, lights.sun);
 const chase = new ChaseCamera(camera);
+// Minimap: de baanvorm wordt 1 keer getekend uit een paar punten van de middenlijn (zie contract 10).
+const MINIMAP_MAIN_POINTS = 240;
+const MINIMAP_SHORTCUT_POINTS = 40;
+const toXZ = (f) => ({ x: f.position.x, z: f.position.z });
+const minimap = createMinimap({
+  main: track.sampleFrames(MINIMAP_MAIN_POINTS).map(toXZ),
+  shortcut: track.sampleShortcutFrames(MINIMAP_SHORTCUT_POINTS).map(toXZ),
+});
 const raceUI = createRaceUI({
   onRestart: () => startRace(lastTypeKey),
   onMenu: () => openMenu(),
@@ -109,6 +118,7 @@ function openMenu() {
   session = null;
   showPreview(lastTypeKey);
   hud.setVisible(false);
+  minimap.setVisible(false);
   raceUI.hideFinish();
   raceUI.setVisible(false);
   menu.show(lastTypeKey);
@@ -130,7 +140,7 @@ function startRace(typeKey) {
   if (preview) preview.remove();
   preview = null;
   if (session) session.dispose();
-  session = new RaceSession({ track, scene, materials, gantry, raceUI, hud, effects, playerTypeKey: typeKey });
+  session = new RaceSession({ track, scene, materials, gantry, raceUI, hud, minimap, effects, playerTypeKey: typeKey });
   chase.snapTo(session.player.bike);
   showControlsHint();
   session.start();

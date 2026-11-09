@@ -1,0 +1,23 @@
+/* Stijl van de minimap (Minimap.js): vierkant canvas rechts, direct onder het geluidsknopje.
+   Klikt nooit iets weg. Op kleine schermen 120 px in plaats van 170 px. */
+
+.minimap {
+  position: absolute;
+  top: calc(var(--ui-gap) + 44px + 10px);   /* geluidsknopje (44 px) + ruimte */
+  right: var(--ui-gap);
+  width: 170px;
+  height: 170px;
+  z-index: 5;
+  pointer-events: none;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+  border-radius: var(--ui-radius);
+}
+.minimap.is-hidden { display: none; }   /* minimap.setVisible(false) */
+
+@media (max-width: 999px), (max-height: 649px) {
+  .minimap {
+    top: calc(var(--ui-gap) + 36px + 8px); /* kleiner geluidsknopje (36 px) */
+    width: 120px;
+    height: 120px;
+  }
+}

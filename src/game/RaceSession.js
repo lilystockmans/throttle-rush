@@ -27,14 +27,17 @@ const PLAYER_SLOT = 4;
 const AI_SLOTS = [0, 1, 2, 3, 5];
 
 export class RaceSession {
-  constructor({ track, scene, materials, gantry, raceUI, hud, effects, playerTypeKey }) {
-    Object.assign(this, { track, scene, materials, gantry, raceUI, hud, effects });
+  constructor({ track, scene, materials, gantry, raceUI, hud, minimap, effects, playerTypeKey }) {
+    Object.assign(this, { track, scene, materials, gantry, raceUI, hud, minimap, effects });
     this.playerControls = NO_CONTROLS;
     this.race = new RaceManager(track);
     this.riders = []; // { id, name, rider, ai } - ai is null voor de speler
 
     this.addPlayer(playerTypeKey);
     this.addOpponents();
+
+    // Lijst voor de minimap: wordt bij elk beeld hergebruikt, zodat er niets nieuws gemaakt wordt.
+    this.mapRiders = this.riders.map((r) => ({ color: r.color, x: 0, z: 0, heading: 0, isPlayer: r.id === "player" }));
 
     this.race.onEvent((e) => this.onRaceEvent(e));
     this.standingsTimer = 0;
@@ -92,6 +95,7 @@ export class RaceSession {
     this.raceUI.hideFinish();
     this.raceUI.setVisible(true);
     this.hud.setVisible(true);
+    this.minimap.setVisible(true);
     this.race.start();
   }
 
@@ -159,6 +163,7 @@ export class RaceSession {
       playerControls: this.playerControls, boosting: s.active && s.kind === "turbo",
       playerFinished: me.finished,
     });
+    this.updateMinimap();
     this.hud.setSpeed(this.player.bike.speed * 3.6); // m/s naar km/u
     this.hud.setSurface(this.player.bike.surface);
     this.raceUI.setLap(Math.min(me.lap, CONFIG.race.laps), CONFIG.race.laps);
@@ -171,6 +176,18 @@ export class RaceSession {
       this.standingsTimer = 0.5;
       this.raceUI.updateStandings(this.buildStandings());
     }
+  }
+
+  // Zet de plek en richting van elke rijder in de hergebruikte minimap-lijst.
+  updateMinimap() {
+    for (let i = 0; i < this.riders.length; i++) {
+      const bike = this.riders[i].rider.bike;
+      const m = this.mapRiders[i];
+      m.x = bike.position.x;
+      m.z = bike.position.z;
+      m.heading = bike.heading;
+    }
+    this.minimap.update(this.mapRiders);
   }
 
   // Meter van de speciale knop: hoeveel van de afkoeltijd is voorbij (0..1)?

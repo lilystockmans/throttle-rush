@@ -1,6 +1,6 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 7,
+  "currentPhase": 8,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
@@ -132,6 +132,17 @@
         "label Offroad-boost breekt over 2 regels in HUD",
         "fase 6 polish niet gedaan (geluid, stof, grotere vlam)"
       ]
+    },
+    "8": {
+      "name": "Minimap",
+      "status": "done",
+      "done": [
+        "contract 10-minimap.md",
+        "src/ui/Minimap.js + minimap.css (UX/UI-specialist)",
+        "koppeling in main.js, RaceSession.js, index.html",
+        "getest: geen overlap op 1280x720 en 768x500, verborgen in menu, 0.005 ms per beeld, geen fouten in console"
+      ],
+      "open": []
     }
   },
   "nextStep": "Klaar. Volgende: minimap in een aparte sessie."
