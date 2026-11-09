@@ -1,6 +1,6 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 2,
+  "currentPhase": 3,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
@@ -28,13 +28,14 @@
     },
     "2": {
       "name": "Drie motortypes en ondergrond",
-      "status": "wacht op test van Lily",
+      "status": "done",
       "done": [
         "contract 05 menu",
         "keuzemenu met 3 kaarten, draaiende moto erboven",
         "Esc terug naar menu",
         "overlap kleine schermen opgelost (768x500 getest)",
-        "balans herzien met echte fysica: sport asfalt 29.7 s, cross shortcut 28.8 s (-3%), sport shortcut 34.7 s, cruiser 32.8 s (+10%)"
+        "balans herzien met echte fysica: sport asfalt 29.7 s, cross shortcut 28.8 s (-3%), sport shortcut 34.7 s, cruiser 32.8 s (+10%)",
+        "Lily: goed, gepubliceerd, live menu gecontroleerd"
       ],
       "open": [
         "FPS niet meetbaar in browserpaneel (paneel throttled tot 1 fps, ook fase 1 versie): Lily meet zelf",
@@ -63,5 +64,5 @@
       "status": "pending"
     }
   },
-  "nextStep": "Lily test fase 2. Daarna pushen, fase 3 (race-logica en HUD)."
+  "nextStep": "Fase 3: aftellen, 3 ronden, checkpoints, rondetijden, finish-scherm, opnieuw."
 }
