@@ -1,5 +1,5 @@
 // Startpunt van de game: hier komen alle onderdelen samen.
-// Fase 4: keuzemenu, daarna een race tegen 5 computer-rijders (zie game/RaceSession.js).
+// Keuzemenu, daarna een race tegen 5 computer-rijders (zie game/RaceSession.js).
 // Elk onderdeel komt van een andere specialist en volgt de contracten in docs/contracts/.
 
 import * as THREE from "three";
@@ -16,6 +16,7 @@ import { setupLighting } from "./render/lighting.js";
 import { createInput } from "./core/Input.js";
 import { startGameLoop } from "./core/GameLoop.js";
 import { createFpsMeter } from "./core/Debug.js";
+import { createAutoQuality } from "./core/AutoQuality.js";
 import { ChaseCamera } from "./camera/ChaseCamera.js";
 import { Rider } from "./game/Rider.js";
 import { RaceSession } from "./game/RaceSession.js";
@@ -50,6 +51,8 @@ scene.add(gantry);
 const input = createInput();
 const hud = createHUD();
 const fps = createFpsMeter();
+// Op een trage laptop gaat de kwaliteit vanzelf omlaag tot het vlot loopt.
+const quality = createAutoQuality(renderer, lights.sun);
 const chase = new ChaseCamera(camera);
 const raceUI = createRaceUI({
   onRestart: () => startRace(lastTypeKey),
@@ -115,7 +118,7 @@ openMenu();
 
 // Alleen bij ?debug: maak de game bereikbaar vanuit de browserconsole (voor testen).
 if (new URLSearchParams(location.search).has("debug")) {
-  window.__game = { track, get session() { return session; }, startRace };
+  window.__game = { track, renderer, scene, camera, quality, get session() { return session; }, startRace };
 }
 
 // --- Hoofdlus ----------------------------------------------------------
@@ -137,6 +140,7 @@ startGameLoop({
     }
     renderer.render(scene, camera);
     fps.tick();
+    quality.tick(dt);
   },
 });
 
