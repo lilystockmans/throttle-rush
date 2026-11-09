@@ -28,6 +28,12 @@ export const FLAME_CORE = 0xfff6c8;
 // Doorzichtigheid van de vlam (kern iets dichter, zodat het midden wit blijft).
 const FLAME_OPACITY = 0.85;
 const FLAME_CORE_OPACITY = 0.95;
+// Stofwolkjes: lichter en stoffiger dan DIRT en GRASS, zodat ze als wolkje van de grond los komen.
+// Dirt-stof is zandbruin, gras-stof een lichte groengrijze tint.
+export const DUST_DIRT = 0xe6c08e;
+export const DUST_GRASS = 0xb9d6a2;
+// Licht doorzichtig, zodat de weg er zacht doorheen schemert.
+const DUST_OPACITY = 0.7;
 
 // De 3 lichttinten (0 = donker, 1 = helemaal verlicht).
 // Laagste tint niet te donker: schaduw moet kleurrijk blijven, geen zwart.
@@ -76,6 +82,17 @@ export function createMaterials() {
       toneMapped: false,
     });
 
+  // Stof: toon-materiaal (zelfde cartoonbanden), licht doorzichtig. depthWrite uit: de wolkjes
+  // groeien en krimpen door elkaar, dan geven ze geen sorteerfouten. Schaduw doet het mesh zelf niet mee.
+  const dust = (color) =>
+    new THREE.MeshToonMaterial({
+      color,
+      gradientMap,
+      transparent: true,
+      opacity: DUST_OPACITY,
+      depthWrite: false,
+    });
+
   return {
     road: toon(ASPHALT),
     roadLine: toon(ROAD_LINE),
@@ -93,6 +110,8 @@ export function createMaterials() {
     helmetVisor: toon(HELMET_VISOR),
     flame: glow(FLAME_OUTER, FLAME_OPACITY),
     flameCore: glow(FLAME_CORE, FLAME_CORE_OPACITY),
+    dustDirt: dust(DUST_DIRT),
+    dustGrass: dust(DUST_GRASS),
     paint,
   };
 }

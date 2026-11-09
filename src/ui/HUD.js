@@ -28,6 +28,9 @@ const STAPPEN = 50;
 const LABEL_KLAAR = "SPATIE";
 const LABEL_ACTIEF = "ACTIEF";
 
+// Namen langer dan dit aantal tekens worden kleiner getoond (CSS: .ability__name.is-long)
+const LANGE_NAAM = 10;
+
 export function createHUD() {
   // Bouw de onderdelen
   const root = maakElement("div", "hud");
@@ -121,6 +124,8 @@ export function createHUD() {
       if (naam !== knopNaamNu) {
         knopNaamNu = naam;
         knopNaam.textContent = naam;
+        // Lange namen (bv. "Offroad-boost") krijgen een kleiner lettertype zodat ze op één regel passen
+        knopNaam.classList.toggle("is-long", naam.length > LANGE_NAAM);
       }
       if (staat !== knopStaat) {
         knopStaat = staat;

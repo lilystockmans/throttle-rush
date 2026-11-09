@@ -24,6 +24,10 @@ import { createHUD } from "./ui/HUD.js";
 import { showControlsHint } from "./ui/controlsHint.js";
 import { createBikeMenu } from "./ui/BikeMenu.js";
 import { createRaceUI } from "./ui/RaceUI.js";
+import { createSoundToggle } from "./ui/soundToggle.js";
+import { createAudio } from "./audio/AudioEngine.js";
+import { createDust } from "./world/dust.js";
+import { RaceEffects } from "./game/RaceEffects.js";
 
 // --- Renderer, scène en wereld -----------------------------------------
 // Pixel ratio begrenzen op 1.5: scherp genoeg, veel sneller op retina-schermen.
@@ -46,6 +50,29 @@ scene.add(buildTrackMesh(track, materials));
 scene.add(createProps(track, materials));
 const gantry = createStartGantry(track, materials);
 scene.add(gantry);
+const dust = createDust(scene, materials);
+
+// --- Geluid --------------------------------------------------------------
+// Browsers spelen pas geluid na een actie van de speler: bij de eerste toets of klik zetten we het aan.
+const audio = createAudio();
+const MUTE_KEY = "throttle-rush-muted";
+const startMuted = readMuted();
+audio.setMuted(startMuted);
+const soundToggle = createSoundToggle({
+  onToggle: (muted) => { audio.setMuted(muted); saveMuted(muted); },
+});
+soundToggle.setMuted(startMuted);
+window.addEventListener("keydown", () => audio.unlock());
+window.addEventListener("pointerdown", () => audio.unlock());
+
+// Geluid aan/uit onthouden in de browser (lukt dat niet, dan gewoon niet onthouden).
+function readMuted() {
+  try { return localStorage.getItem(MUTE_KEY) === "1"; } catch { return false; }
+}
+function saveMuted(muted) {
+  try { localStorage.setItem(MUTE_KEY, muted ? "1" : "0"); } catch { /* geen opslag: geen probleem */ }
+}
+const effects = new RaceEffects({ audio, dust });
 
 // --- Interface ---------------------------------------------------------
 const input = createInput();
@@ -103,7 +130,7 @@ function startRace(typeKey) {
   if (preview) preview.remove();
   preview = null;
   if (session) session.dispose();
-  session = new RaceSession({ track, scene, materials, gantry, raceUI, hud, playerTypeKey: typeKey });
+  session = new RaceSession({ track, scene, materials, gantry, raceUI, hud, effects, playerTypeKey: typeKey });
   chase.snapTo(session.player.bike);
   showControlsHint();
   session.start();
@@ -118,7 +145,7 @@ openMenu();
 
 // Alleen bij ?debug: maak de game bereikbaar vanuit de browserconsole (voor testen).
 if (new URLSearchParams(location.search).has("debug")) {
-  window.__game = { track, renderer, scene, camera, quality, get session() { return session; }, startRace };
+  window.__game = { track, renderer, scene, camera, quality, audio, get session() { return session; }, startRace };
 }
 
 // --- Hoofdlus ----------------------------------------------------------
@@ -138,6 +165,7 @@ startGameLoop({
       updateMenuCamera(dt);
       lights.follow(preview.bike.position);
     }
+    dust.update(dt);
     renderer.render(scene, camera);
     fps.tick();
     quality.tick(dt);

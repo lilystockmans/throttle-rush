@@ -1,0 +1,51 @@
+/* Stijl van het geluidsknopje rechtsboven (soundToggle.js). Staat boven alle andere lagen van #ui
+   (menu, race, finish-scherm) en laat klikken door ondanks pointer-events: none op #ui. */
+
+.sound-toggle {
+  position: absolute;
+  top: var(--ui-gap);
+  right: var(--ui-gap);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  cursor: pointer;
+  pointer-events: auto;
+  background: var(--ui-panel);
+  border: 3px solid var(--ui-accent);
+  border-radius: 50%;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, opacity 0.2s ease, border-color 0.2s ease;
+}
+.sound-toggle:hover { transform: translateY(-1px); }
+.sound-toggle:active { transform: translateY(2px); }
+
+.sound-toggle__icon { position: relative; font-size: 20px; line-height: 1; }
+
+/* Gedempt: gedimd, grijze rand en een schuine streep over het icoon */
+.sound-toggle.is-muted { opacity: 0.6; border-color: rgba(255, 255, 255, 0.4); }
+.sound-toggle.is-muted .sound-toggle__icon { opacity: 0.5; }
+.sound-toggle.is-muted::after {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 3px;
+  background: var(--ui-accent-2);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--ui-ink);
+  transform: rotate(-45deg);
+}
+
+@media (max-width: 999px), (max-height: 649px) {
+  .sound-toggle { width: 36px; height: 36px; border-width: 2px; }
+  .sound-toggle__icon { font-size: 16px; }
+  .sound-toggle.is-muted::after { width: 21px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sound-toggle { transition: none; }
+  .sound-toggle:hover, .sound-toggle:active { transform: none; }
+}

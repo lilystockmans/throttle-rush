@@ -189,6 +189,8 @@
   color: var(--ui-ink); background: var(--ui-accent); border: 3px solid var(--ui-ink); border-radius: 999px;
   box-shadow: 0 5px 0 var(--ui-keycap-edge); animation: menu-pulse 1.2s ease-in-out infinite; }
 .menu__keys { margin: 0; font-weight: 800; font-size: 14px; text-shadow: 0 2px 0 var(--ui-ink); }
+/* Extra regel onder de uitleg van het menu: R en M, zonder BikeMenu.js aan te passen */
+.menu__keys::after { content: "In de race: R = terug op de baan, M = geluid aan/uit."; display: block; margin-top: 2px; font-size: 0.9em; opacity: 0.85; }
 @keyframes menu-pulse { 50% { transform: scale(1.06); } }
 
 /* ---------- Kleine schermen: smaller dan 1000 px of lager dan 650 px ---------- */
@@ -218,10 +220,37 @@
   .menu__start { padding: 3px 26px 5px; font-size: 20px; }
   .menu__keys { font-size: 12px; }
 }
-/* Heel laag (zoals 768 x 500): de uitlegzin valt weg, anders is het midden te vol */
+/* Laag (zoals 768 x 500): kaarten compacter, uitlegzin weg, en het menu scrolt als het toch niet past
+   zodat de Start-knop nooit half buiten beeld staat. */
 @media (max-height: 560px) {
   .card__tip { display: none; }
+  .menu { overflow-y: auto; padding-top: 8px; padding-bottom: 8px; }
+  .menu__title { font-size: 32px; }
+  .menu__cards { gap: 8px; padding-top: 8px; }
+  .card__band { height: 6px; }
+  .card__body { padding: 4px 8px 6px; }
+  .card__name { font-size: 17px; white-space: nowrap; }
+  .bar { margin-top: 2px; }
+  .bar__label { flex-basis: 50px; font-size: 10px; }
+  .bar__track { height: 6px; }
+  .card__ability { margin-top: 4px; font-size: 10px; }
+  .menu__start { padding: 2px 22px 4px; font-size: 18px; flex: none; }
+  .menu__keys { font-size: 11px; }
+
+  /* Besturingsuitleg compacter: geen titel, kleinere rijen. Zo botst hij nooit met het race-paneel linksboven. */
+  .hint { padding: 5px 9px; }
+  .hint__title { display: none; }
+  .hint__row { margin-top: 2px; font-size: 11px; }
+  .keycap { font-size: 11px; min-width: 17px; }
 }
+/* Heel weinig hoogte (zoals 640 x 420 en lager): de uitleg verdwijnt helemaal, het race-paneel gaat voor */
+@media (max-height: 440px) {
+  .hint { display: none; }
+  .menu__keys::after { display: none; }
+}
+/* Smalle kaarten: namen mogen nooit worden afgekapt */
+.card__name { white-space: nowrap; }
+@media (max-width: 760px) { .card__name { font-size: 15px; } }
 
 /* Wie liever minder beweging heeft: geen schuivende overgang, geen pulserende knop */
 @media (prefers-reduced-motion: reduce) {

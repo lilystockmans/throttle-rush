@@ -97,8 +97,22 @@
       ]
     },
     "6": {
-      "name": "Polish (optioneel)",
-      "status": "overgeslagen"
+      "name": "Polish",
+      "status": "done",
+      "done": [
+        "contract 09",
+        "geluid in code (Web Audio): motor, aftellen, knoppen, botsing, finish",
+        "geluidsknop rechtsboven + toets M, onthouden in browser",
+        "stofwolkjes op gras en aarde (max 200, InstancedMesh)",
+        "turbovlam 1.3 m",
+        "label Offroad-boost op 1 regel",
+        "geen overlap in kleine vensters, menu scrolt op lage schermen",
+        "R en M uitgelegd in het menu",
+        "RaceEffects.js bundelt geluid en stof"
+      ],
+      "open": [
+        "geluid niet beluisterd door Claude: Lily controleert klank en volume"
+      ]
     },
     "7": {
       "name": "Prestatie-check en eindpublicatie",
@@ -120,5 +134,5 @@
       ]
     }
   },
-  "nextStep": "Project af. Optioneel: fase 6 polish."
+  "nextStep": "Klaar. Volgende: minimap in een aparte sessie."
 }

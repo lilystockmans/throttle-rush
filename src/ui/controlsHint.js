@@ -12,6 +12,7 @@ const REGELS = [
   { toetsen: ["Spatie"], label: "speciale knop" },
   { toetsen: ["R"], label: "terug op de baan" },
   { toetsen: ["Esc"], label: "terug naar het menu" },
+  { toetsen: ["M"], label: "geluid aan/uit" },
 ];
 
 // Het paneel dat nu in beeld is (of null). Hiermee ruimen we bij een nieuwe aanroep het oude op.

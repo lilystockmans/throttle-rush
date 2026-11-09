@@ -11,14 +11,21 @@
 }
 .ability.is-hidden { display: none; }
 
-.ability__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ability__head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: nowrap; gap: 8px; }
 .ability__name {
+  min-width: 0;                 /* mag krimpen in de flex-rij */
+  white-space: nowrap;          /* nooit over twee regels */
+  overflow: hidden;
+  text-overflow: ellipsis;      /* laatste redmiddel: afkappen met "..." */
   font-family: var(--font-display);
   font-size: 18px;
   line-height: 1.1;
   text-shadow: 0 2px 0 var(--ui-ink);
 }
+.ability__name.is-long { font-size: 15px; }
 .ability__label {
+  flex: none;                   /* het label (SPATIE / ACTIEF / %) krimpt nooit */
+  white-space: nowrap;
   font-weight: 800;
   font-size: 13px;
   letter-spacing: 0.06em;
@@ -91,6 +98,7 @@
 @media (max-width: 999px), (max-height: 649px) {
   .ability { margin-top: 4px; padding-top: 3px; }
   .ability__name { font-size: 14px; }
+  .ability__name.is-long { font-size: 12px; }
   .ability__label { font-size: 11px; }
   .ability[data-state="ready"] .ability__label { font-size: 12px; }
   .ability__track { height: 9px; margin-top: 2px; border-width: 1.5px; }

@@ -39,3 +39,8 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 19:37:53 | 19:43:57 | 6m 04s | Coder | Fase 5: Bike push/stun/modifiers, abilities, botsingen, AI gebruikt knoppen volgens contract 08 B-E |
 | 2026-11-09 | 19:48:18 | 19:50:31 | 2m 13s | Lily | Fase 7: afronden |
 | 2026-11-09 | 19:50:27 | 20:00:13 | 9m 46s | Tester | Fase 7: eindtest van de live game als speler (menu, drie moto's, knoppen, botsingen, shortcut, finish), bevindingen in docs/tests/fase7-eindtest.md |
+| 2026-11-09 | 20:02:38 | 20:04:16 | 1m 38s | Lily | ga verder met fase 6. dan een andere sessie want ik wil de map kunnen zien en waar ik rij op de course |
+| 2026-11-09 | 20:03:18 | 20:04:04 | 0m 46s | Shading-specialist | Fase 6: stof-materialen dustDirt en dustGrass volgens contract 09-D |
+| 2026-11-09 | 20:03:18 | 20:04:53 | 1m 35s | Geluidsontwerper | Fase 6: AudioEngine met Web Audio (motor, aftellen, knoppen, botsing, finish) volgens contract 09-A |
+| 2026-11-09 | 20:03:18 | 20:05:15 | 1m 57s | UX/UI-specialist | Fase 6: geluidsknop (M), label-fix, overlap kleine vensters, menu-fixes uit eindtest volgens contract 09-E |
+| 2026-11-09 | 20:03:18 | 20:05:43 | 2m 25s | 3D-modelleur | Fase 6: stofwolkjes (InstancedMesh-pool) en grotere turbovlam volgens contract 09-B en C |

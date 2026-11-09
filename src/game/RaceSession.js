@@ -27,8 +27,9 @@ const PLAYER_SLOT = 4;
 const AI_SLOTS = [0, 1, 2, 3, 5];
 
 export class RaceSession {
-  constructor({ track, scene, materials, gantry, raceUI, hud, playerTypeKey }) {
-    Object.assign(this, { track, scene, materials, gantry, raceUI, hud });
+  constructor({ track, scene, materials, gantry, raceUI, hud, effects, playerTypeKey }) {
+    Object.assign(this, { track, scene, materials, gantry, raceUI, hud, effects });
+    this.playerControls = NO_CONTROLS;
     this.race = new RaceManager(track);
     this.riders = []; // { id, name, rider, ai } - ai is null voor de speler
 
@@ -60,7 +61,9 @@ export class RaceSession {
 
   // Wordt de speler opzij geduwd door een cruiser? Laat het hem weten.
   onAbilityUsed(entry, info) {
-    if (info.target === this.player.bike) this.hud.flashHit(`${entry.name}: zijduw!`);
+    const playerHit = info.target === this.player.bike;
+    this.effects.onAbility({ byPlayer: entry.id === "player", kind: info.kind, playerHit });
+    if (playerHit) this.hud.flashHit(`${entry.name}: zijduw!`);
     else if (entry.id === "player" && info.target) this.hud.flashHit("Raak!");
   }
 
@@ -96,6 +99,7 @@ export class RaceSession {
   // 1. besturing kiezen, 2. speciale knop, 3. moto bewegen, 4. botsingen oplossen, 5. race tellen.
   update(dt, playerControls) {
     const canMove = this.race.canMove();
+    this.playerControls = canMove ? playerControls : NO_CONTROLS; // voor het motorgeluid
     const bikes = this.riders.map((r) => r.rider.bike);
     for (const r of this.riders) {
       const bike = r.rider.bike;
@@ -149,6 +153,12 @@ export class RaceSession {
     }
     this.updateAbilityMeter();
     const me = this.race.getRider("player");
+    const s = this.riders[0].ability.state;
+    this.effects.frame({
+      riders: this.riders.map((r) => r.rider.bike), playerBike: this.player.bike,
+      playerControls: this.playerControls, boosting: s.active && s.kind === "turbo",
+      playerFinished: me.finished,
+    });
     this.hud.setSpeed(this.player.bike.speed * 3.6); // m/s naar km/u
     this.hud.setSurface(this.player.bike.surface);
     this.raceUI.setLap(Math.min(me.lap, CONFIG.race.laps), CONFIG.race.laps);
@@ -186,6 +196,7 @@ export class RaceSession {
     const ui = this.raceUI;
     if (e.type === "countdown") {
       ui.showCountdown(e.value);
+      this.effects.onCountdown(e.value);
       // Startlampen: 3 = één rood, 2 = twee rood, 1 = drie rood, GO = alle groen.
       if (e.value === "GO") this.gantry.userData.setLights(3, 0x22ff55);
       else this.gantry.userData.setLights(4 - e.value, 0xff2222);
@@ -195,6 +206,7 @@ export class RaceSession {
     else if (e.type === "lap" && e.lap < CONFIG.race.laps) ui.flash(`Ronde ${e.lap}`);
     else if (e.type === "finish") {
       const me = this.race.getRider("player");
+      this.effects.onPlayerFinish(e.position);
       ui.showFinish({
         position: e.position, total: this.riders.length, totalTime: e.totalTime,
         lapTimes: me.lapTimes, bestLap: me.bestLap, bikeLabel: this.player.bike.type.label,
@@ -210,5 +222,6 @@ export class RaceSession {
   dispose() {
     for (const r of this.riders) r.rider.remove();
     this.gantry.userData.setLights(0);
+    this.effects.stop();
   }
 }

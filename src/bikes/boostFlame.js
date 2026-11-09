@@ -1,8 +1,11 @@
-// Turbovlam van de moto (contract 08-G): twee gestileerde kegels die naar +Z wijzen.
+// Turbovlam van de moto (contract 08-G, vergroot door 09-C): twee gestileerde kegels die naar +Z wijzen.
 // De geometrie wordt gedeeld door alle modellen; elke moto krijgt alleen eigen meshes.
 import * as THREE from "three";
 
-const LENGTE = 0.8; // meter bij scale.z = 1
+const LENGTE = 1.3; // meter bij scale.z = 1 (goed zichtbaar van 7.5 m afstand)
+const STRAAL_BUITEN = 0.13; // iets breder dan voorheen (0.09)
+const STRAAL_BINNEN = 0.075; // heldere kern (voorheen 0.05)
+const KERN_DEEL = 0.6; // kern is 60% zo lang als de buitenkegel
 let gedeeld = null; // { buiten, binnen }: 2 x 16 = 32 driehoeken
 
 // Kegel met de basis op z = 0 en de punt op z = lengte (open basis: die ziet niemand).
@@ -14,7 +17,7 @@ function maakKegel(straal, lengte) {
 }
 
 function getGeometrie() {
-  gedeeld ??= { buiten: maakKegel(0.09, LENGTE), binnen: maakKegel(0.05, LENGTE * 0.6) };
+  gedeeld ??= { buiten: maakKegel(STRAAL_BUITEN, LENGTE), binnen: maakKegel(STRAAL_BINNEN, LENGTE * KERN_DEEL) };
   return gedeeld;
 }
 
