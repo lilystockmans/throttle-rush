@@ -1,6 +1,6 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 3,
+  "currentPhase": 4,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
@@ -45,7 +45,7 @@
     },
     "3": {
       "name": "Race-logica en HUD",
-      "status": "wacht op test van Lily",
+      "status": "done",
       "done": [
         "contract 06",
         "RaceManager met controlepunten buiten shortcut (coder-test: valsspelen geweigerd, shortcut geldig)",
@@ -61,7 +61,21 @@
     },
     "4": {
       "name": "Computer-tegenstanders",
-      "status": "pending"
+      "status": "wacht op test van Lily",
+      "done": [
+        "contract 07",
+        "AIDriver: 0 resets, cross-AI neemt shortcut, 11 µs per stap voor 6",
+        "5 tegenstanders: Baron von Burnout, Modder Mo, Tante Turbo, Opa Oliebol, Slakke Sam",
+        "RaceSession.js: speler + 5 AI, autopiloot na finish",
+        "klassement op finish-scherm",
+        "browser-race: speler 1:31.97, Modder Mo 1:33.97, Opa Oliebol 1:52.08, geen fouten",
+        "61 fps met 6 rijders in tab zonder viewport-emulatie",
+        "README.md"
+      ],
+      "open": [
+        "Opa Oliebol (cruiser) eindigt ver achter: 20 s",
+        "viewport-emulatie in het paneel throttlet tot 1 fps"
+      ]
     },
     "5": {
       "name": "Speciale knoppen en botsingen",
@@ -76,5 +90,5 @@
       "status": "pending"
     }
   },
-  "nextStep": "Lily test fase 3. Daarna fase 4: 5 computer-tegenstanders."
+  "nextStep": "Lily test fase 4. Daarna fase 5: botsingen en speciale knoppen."
 }

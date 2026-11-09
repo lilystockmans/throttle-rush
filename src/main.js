@@ -1,5 +1,5 @@
 // Startpunt van de game: hier komen alle onderdelen samen.
-// Fase 3: keuzemenu, aftellen met startlampen, 3 ronden, finish-scherm, opnieuw.
+// Fase 4: keuzemenu, daarna een race tegen 5 computer-rijders (zie game/RaceSession.js).
 // Elk onderdeel komt van een andere specialist en volgt de contracten in docs/contracts/.
 
 import * as THREE from "three";
@@ -17,8 +17,8 @@ import { createInput } from "./core/Input.js";
 import { startGameLoop } from "./core/GameLoop.js";
 import { createFpsMeter } from "./core/Debug.js";
 import { ChaseCamera } from "./camera/ChaseCamera.js";
-import { RaceManager } from "./race/RaceManager.js";
 import { Rider } from "./game/Rider.js";
+import { RaceSession } from "./game/RaceSession.js";
 import { createHUD } from "./ui/HUD.js";
 import { showControlsHint } from "./ui/controlsHint.js";
 import { createBikeMenu } from "./ui/BikeMenu.js";
@@ -46,136 +46,95 @@ scene.add(createProps(track, materials));
 const gantry = createStartGantry(track, materials);
 scene.add(gantry);
 
-// --- Speler ------------------------------------------------------------
-let player = null;
-let race = null;
+// --- Interface ---------------------------------------------------------
+const input = createInput();
+const hud = createHUD();
+const fps = createFpsMeter();
+const chase = new ChaseCamera(camera);
+const raceUI = createRaceUI({
+  onRestart: () => startRace(lastTypeKey),
+  onMenu: () => openMenu(),
+});
+const menu = createBikeMenu({
+  bikeTypes: BIKE_TYPES,
+  onHover: (key) => showPreview(key),
+  onChoose: (key) => startRace(key),
+});
 
-// Maak een nieuwe speler-moto van dit type op startplek 1 (midden voorste rij).
-function spawnPlayer(typeKey) {
-  if (player) player.remove();
+// --- Menu: één moto draait in beeld ------------------------------------
+let session = null;      // de lopende race, of null in het menu
+let preview = null;      // de moto die in het menu ronddraait
+let lastTypeKey = "sport";
+let orbitAngle = 0;
+
+function showPreview(typeKey) {
+  if (preview) preview.remove();
   const type = BIKE_TYPES[typeKey];
-  player = new Rider({ typeKey, type, color: type.color, track, materials, scene });
-  player.placeAt(track.getStartTransform(1));
+  preview = new Rider({ typeKey, type, color: type.color, track, materials, scene });
+  preview.placeAt(track.getStartTransform(1));
 }
 
-// --- Camera's ----------------------------------------------------------
-const chase = new ChaseCamera(camera);
+function openMenu() {
+  if (session) session.dispose();
+  session = null;
+  showPreview(lastTypeKey);
+  hud.setVisible(false);
+  raceUI.hideFinish();
+  raceUI.setVisible(false);
+  menu.show(lastTypeKey);
+}
 
-// In het menu draait de camera langzaam rond de gekozen moto.
-let orbitAngle = 0;
+// In het menu draait de camera langzaam rond de moto.
 function updateMenuCamera(dt) {
   orbitAngle += dt * 0.35;
-  const p = player.model.position;
+  const p = preview.model.position;
   camera.position.set(p.x + Math.sin(orbitAngle) * 5, 1.5, p.z + Math.cos(orbitAngle) * 5);
   // We kijken net ONDER de moto: zo staat ze hoger in beeld, boven de menukaarten.
   camera.lookAt(p.x, -0.2, p.z);
 }
 
-// --- Interface ---------------------------------------------------------
-const input = createInput();
-const hud = createHUD();
-const fps = createFpsMeter();
-const raceUI = createRaceUI({
-  onRestart: () => startRace(player.typeKey),
-  onMenu: () => openMenu(),
-});
-const menu = createBikeMenu({
-  bikeTypes: BIKE_TYPES,
-  onHover: (key) => spawnPlayer(key),   // laat de moto zien die je bekijkt
-  onChoose: (key) => startRace(key),
-});
-
-function openMenu() {
-  race = null;
-  gantry.userData.setLights(0);
-  spawnPlayer(player ? player.typeKey : "sport");
-  hud.setVisible(false);
-  raceUI.hideFinish();
-  raceUI.setVisible(false);
-  menu.show(player.typeKey);
-}
-
-// --- Race --------------------------------------------------------------
+// --- Race ----------------------------------------------------------------
 function startRace(typeKey) {
-  spawnPlayer(typeKey);
-  chase.snapTo(player.bike);
-  race = new RaceManager(track);
-  race.addRider("player", player.bike);
-  race.onEvent(onRaceEvent);
-  raceUI.hideFinish();
-  raceUI.setVisible(true);
-  raceUI.setPosition(1, 1);
-  hud.setVisible(true);
+  lastTypeKey = typeKey;
+  if (menu.isOpen()) menu.hide();
+  if (preview) preview.remove();
+  preview = null;
+  if (session) session.dispose();
+  session = new RaceSession({ track, scene, materials, gantry, raceUI, hud, playerTypeKey: typeKey });
+  chase.snapTo(session.player.bike);
   showControlsHint();
-  race.start();
-}
-
-// Wat er gebeurt bij elke race-gebeurtenis (zie contract 06-B).
-function onRaceEvent(e) {
-  if (e.type === "countdown") {
-    raceUI.showCountdown(e.value);
-    // Startlampen: 3 = één rood, 2 = twee rood, 1 = drie rood, GO = alle groen.
-    if (e.value === "GO") gantry.userData.setLights(3, 0x22ff55);
-    else gantry.userData.setLights(4 - e.value, 0xff2222);
-  } else if (e.type === "finalLap" && e.id === "player") {
-    raceUI.flash("Laatste ronde!");
-  } else if (e.type === "lap" && e.id === "player" && e.lap < CONFIG.race.laps) {
-    raceUI.flash(`Ronde ${e.lap}`);
-  } else if (e.type === "finish" && e.id === "player") {
-    const r = race.getRider("player");
-    raceUI.showFinish({
-      position: e.position, total: race.getStandings().length, totalTime: e.totalTime,
-      lapTimes: r.lapTimes, bestLap: r.bestLap, bikeLabel: player.bike.type.label,
-    });
-  }
-}
-
-// Lampen gaan 2 seconden na GO weer uit.
-function updateGantry() {
-  if (race && race.state !== "countdown" && race.raceTime > 2) gantry.userData.setLights(0);
+  session.start();
 }
 
 // Esc tijdens het rijden = terug naar het menu (het finish-scherm regelt zijn eigen Esc).
 window.addEventListener("keydown", (e) => {
-  const finishOpen = race && race.getRider("player").finished;
-  if (e.code === "Escape" && !menu.isOpen() && !finishOpen) openMenu();
+  if (e.code === "Escape" && session && !session.isPlayerFinished()) openMenu();
 });
 
 openMenu();
 
 // Alleen bij ?debug: maak de game bereikbaar vanuit de browserconsole (voor testen).
 if (new URLSearchParams(location.search).has("debug")) {
-  window.__game = { track, get bike() { return player.bike; }, get race() { return race; }, startRace };
+  window.__game = { track, get session() { return session; }, startRace };
 }
 
 // --- Hoofdlus ----------------------------------------------------------
-// Tijdens het aftellen en na de finish negeert de moto de toetsen (geen gas, geen sturen).
-const NO_CONTROLS = { throttle: 0, brake: 0, steer: 0, action: false, reset: false };
-
 startGameLoop({
   // Vaste stap: 60 keer per seconde, los van de beeldsnelheid.
   update(dt) {
-    if (!race) return; // menu open: alles staat stil
-    const r = race.getRider("player");
-    const controls = race.canMove() && !r.finished ? input.read() : NO_CONTROLS;
-    player.bike.update(dt, controls);
-    race.update(dt);
+    if (session) session.update(dt, input.read());
   },
   // Eén keer per getekend beeld.
   render(dt) {
-    player.syncModel(dt);
-    if (race) {
-      chase.update(dt, player.bike);
-      const r = race.getRider("player");
-      hud.setSpeed(player.bike.speed * 3.6); // m/s naar km/u
-      hud.setSurface(player.bike.surface);
-      raceUI.setLap(Math.min(r.lap, CONFIG.race.laps), CONFIG.race.laps);
-      raceUI.setTimes(r.currentLapTime, r.bestLap);
-      updateGantry();
+    if (session) {
+      session.render(dt);
+      chase.update(dt, session.player.bike);
+      lights.follow(session.player.bike.position);
     } else {
+      preview.syncModel(dt);
       updateMenuCamera(dt);
+      lights.follow(preview.bike.position);
     }
-    lights.follow(player.bike.position);
     renderer.render(scene, camera);
     fps.tick();
   },

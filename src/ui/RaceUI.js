@@ -1,7 +1,9 @@
 // RaceUI.js: de race-interface. Aftellen groot in het midden, een paneel linksboven (ronde, tijd, beste,
 // positie), korte meldingen en het finish-scherm met twee knoppen. Alles staat in een eigen laag in <div id="ui">.
 // setTimes() wordt elk beeld aangeroepen: we schrijven alleen naar de pagina als de tekst echt verandert.
-// De stijl staat in race.css. Knoppen zijn <div>'s (net als in het menu), zodat spatie nooit dubbel klikt.
+// Het klassement (contract 07-C) staat in standings.js. De stijl staat in race.css. Knoppen zijn <div>'s (net als in het menu), zodat spatie nooit dubbel klikt.
+
+import { createStandings } from "./standings.js";
 
 const COUNTDOWN_MS = 800;       // hoe lang een cijfer in beeld blijft (gelijk aan de animatie in race.css)
 const GEEN_TIJD = "-:--.--";    // tekst als er nog geen tijd is (bijvoorbeeld nog geen beste ronde)
@@ -73,6 +75,7 @@ export function createRaceUI({ onRestart, onMenu } = {}) {
   let positieVerborgen = true;
   let aftelTimer = null;
   let finishOpen = false;
+  let klassement = null; // het klassement van het open finish-scherm (null = er is geen)
 
   // ---------- Finish-toetsen: alleen actief zolang het scherm open is ----------
   function opToets(e) {
@@ -145,7 +148,7 @@ export function createRaceUI({ onRestart, onMenu } = {}) {
       herstartAnimatie(flashEl, "is-show");
     },
 
-    showFinish({ position, total, totalTime, lapTimes = [], bestLap, bikeLabel = "" }) {
+    showFinish({ position, total, totalTime, lapTimes = [], bestLap, bikeLabel = "", standings }) {
       api.hideFinish();
       finishEl.textContent = "";
 
@@ -173,14 +176,31 @@ export function createRaceUI({ onRestart, onMenu } = {}) {
         maakKnop("Andere moto", "Esc", "race-btn--alt", onMenu),
       );
 
-      kaart.append(lijst, maak("div", "race-card__bike", bikeLabel), knoppen);
+      // Met klassement: rondetijden en klassement in twee vakken (naast elkaar of onder elkaar, zie race.css)
+      klassement = null;
+      if (Array.isArray(standings) && standings.length > 0) {
+        klassement = createStandings(formatTime);
+        klassement.update(standings);
+        const kolommen = maak("div", "race-card__cols");
+        kolommen.append(lijst, klassement.el);
+        kaart.classList.add("race-card--standings");
+        kaart.append(kolommen, maak("div", "race-card__bike", bikeLabel), knoppen);
+      } else {
+        kaart.append(lijst, maak("div", "race-card__bike", bikeLabel), knoppen);
+      }
       finishEl.appendChild(kaart);
       finishEl.classList.add("is-open");
       finishOpen = true;
       window.addEventListener("keydown", opToets);
     },
 
+    // Werk het klassement bij terwijl het finish-scherm open is (zonder klassement bij showFinish: niets doen)
+    updateStandings(standings) {
+      if (finishOpen && klassement) klassement.update(standings);
+    },
+
     hideFinish() {
+      klassement = null;
       window.removeEventListener("keydown", opToets);
       finishOpen = false;
       finishEl.classList.remove("is-open");

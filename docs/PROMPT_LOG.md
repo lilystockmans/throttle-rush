@@ -26,3 +26,7 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 15:52:43 | 15:54:17 | 1m 34s | 3D-modelleur | Fase 3: startportaal met drie startlampen en setLights volgens contract 06-D |
 | 2026-11-09 | 15:52:43 | 15:54:51 | 2m 08s | UX/UI-specialist | Fase 3: race-interface (aftellen, ronde, tijden, positie, meldingen, finish-scherm) volgens contract 06-C |
 | 2026-11-09 | 15:52:43 | 15:55:51 | 3m 08s | Coder | Fase 3: RaceManager (aftellen, ronden, controlepunten buiten de shortcut, posities, gebeurtenissen) volgens contract 06-B |
+| 2026-11-09 | 19:24:57 | 19:26:41 | 1m 44s | Lily | Try again |
+| 2026-11-09 | 19:25:54 | 19:26:42 | 0m 48s | Game designer | Fase 4: vijf tegenstanders (naam, type, kleur, skill, lijn, shortcut) volgens contract 07-A |
+| 2026-11-09 | 19:25:54 | 19:27:13 | 1m 19s | UX/UI-specialist | Fase 4: klassement op het finish-scherm, updateStandings volgens contract 07-C |
+| 2026-11-09 | 19:25:54 | 19:29:50 | 3m 56s | Coder | Fase 4: AIDriver (baan volgen, remmen voor bochten, shortcut, reset) volgens contract 07-B |

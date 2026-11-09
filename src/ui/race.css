@@ -85,3 +85,42 @@
 @media (prefers-reduced-motion: reduce) {
   .race-countdown.is-pop, .race-card { animation: none; }
 }
+
+/* ---------- Klassement op het finish-scherm (contract 07-C) ---------- */
+/* Zonder klassement verandert er niets. Met klassement is de kaart breder en scrolt hij binnen zichzelf. */
+.race-card--standings { width: min(92vw, 560px); overflow-y: auto; }
+.race-card--standings > * { flex-shrink: 0; }
+.race-card__cols { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.race-card__cols .race-laps { margin-top: 0; }
+.race-stand { width: 100%; display: grid; gap: 4px; }
+.race-stand__row { display: flex; align-items: center; gap: 8px; padding: 3px 10px; font-weight: 800; font-size: 15px; text-align: left;
+  background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+.race-stand__place { width: 1.4em; font-family: var(--font-display); font-size: 18px; text-align: center; }
+.race-stand__dot { flex: none; width: 14px; height: 14px; border: 2px solid var(--ui-ink); border-radius: 50%; }
+.race-stand__who { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.15; }
+.race-stand__name, .race-stand__bike { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.race-stand__bike { font-size: 11px; opacity: 0.7; }
+.race-stand__time { font-family: var(--font-display); font-size: 17px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.race-stand__row.is-busy .race-stand__time { font-family: inherit; font-size: 12px; opacity: 0.7; text-transform: uppercase; }
+/* De speler: accentkleur en een "Jij"-label, zodat je je eigen rij meteen ziet */
+.race-stand__row.is-player { color: var(--ui-ink); background: var(--ui-accent); box-shadow: 0 0 0 2px var(--ui-ink); }
+.race-stand__row.is-player .race-stand__name::after { content: " (jij)"; font-weight: 800; }
+.race-stand__row.is-player .race-stand__bike, .race-stand__row.is-player.is-busy .race-stand__time { opacity: 0.8; }
+
+/* Brede schermen: klassement naast de rondetijden */
+@media (min-width: 1000px) and (min-height: 650px) {
+  .race-card--standings { width: min(94vw, 860px); }
+  .race-card__cols { flex-direction: row; align-items: flex-start; gap: 16px; }
+  .race-card__cols .race-laps { flex: 0 0 38%; width: auto; }
+  .race-card__cols .race-stand { flex: 1; }
+}
+
+/* Kleine schermen: klassement onder de rondetijden, compacter */
+@media (max-width: 999px), (max-height: 649px) {
+  .race-card--standings { width: min(92vw, 520px); }
+  .race-card__cols { gap: 4px; }
+  .race-stand { gap: 2px; }
+  .race-stand__row { padding: 1px 8px; font-size: 13px; }
+  .race-stand__place { font-size: 15px; }
+  .race-stand__time { font-size: 14px; }
+}
