@@ -1,63 +1,102 @@
-// Startpunt van de game.
-// Fase 0: een lege wereld met grond, lucht en een draaiende kubus.
-// Dit bewijst dat three.js werkt, lokaal en op de publieke URL.
+// Startpunt van de game: hier komen alle onderdelen samen.
+// Fase 1: één circuit, één sport-moto, chase-camera, snelheidsmeter.
+// Elk onderdeel komt van een andere specialist en volgt de contracten in docs/contracts/.
 
 import * as THREE from "three";
+import { CONFIG } from "./config.js";
+import { TRACK } from "./world/trackData.js";
+import { BIKE_TYPES } from "./bikes/bikeTypes.js";
+import { Track } from "./world/Track.js";
+import { Bike } from "./bikes/Bike.js";
+import { createBikeModel } from "./bikes/BikeModel.js";
+import { buildTrackMesh } from "./world/trackMesh.js";
+import { createProps } from "./world/props.js";
+import { createEnvironment } from "./world/Environment.js";
+import { createMaterials } from "./render/materials.js";
+import { setupLighting } from "./render/lighting.js";
+import { createInput } from "./core/Input.js";
+import { startGameLoop } from "./core/GameLoop.js";
 import { createFpsMeter } from "./core/Debug.js";
+import { ChaseCamera } from "./camera/ChaseCamera.js";
+import { createHUD } from "./ui/HUD.js";
+import { showControlsHint } from "./ui/controlsHint.js";
 
-// Renderer: tekent de 3D-wereld op een canvas.
-// Pixel ratio begrenzen we op 1.5: scherp genoeg, en veel sneller op retina-schermen.
+// --- Renderer en scène -------------------------------------------------
+// Pixel ratio begrenzen op 1.5: scherp genoeg, veel sneller op retina-schermen.
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Scène met lichtblauwe lucht en mist in dezelfde kleur.
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-scene.fog = new THREE.Fog(0x87ceeb, 50, 200);
-
-// Camera: 1 eenheid = 1 meter. Y is omhoog.
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
-camera.position.set(0, 3, 6);
-camera.lookAt(0, 0.5, 0);
-
-// Licht: één zon + zacht omgevingslicht.
-scene.add(new THREE.HemisphereLight(0xffffff, 0x557744, 1.2));
-const sun = new THREE.DirectionalLight(0xffffff, 1.5);
-sun.position.set(10, 20, 10);
-scene.add(sun);
-
-// Grond.
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(400, 400),
-  new THREE.MeshLambertMaterial({ color: 0x5a9e4b })
+const camera = new THREE.PerspectiveCamera(
+  CONFIG.camera.fov, window.innerWidth / window.innerHeight, 0.1, 400
 );
-ground.rotation.x = -Math.PI / 2;
-scene.add(ground);
 
-// Draaiende kubus.
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshLambertMaterial({ color: 0xff5533 })
-);
-cube.position.y = 0.5;
-scene.add(cube);
+// --- Wereld ------------------------------------------------------------
+const materials = createMaterials();
+const lights = setupLighting(scene, renderer);
+createEnvironment(scene, materials);
 
-// Venstergrootte aanpassen als het browservenster verandert.
+const track = new Track(TRACK);
+scene.add(buildTrackMesh(track, materials));
+scene.add(createProps(track, materials));
+
+// --- Speler ------------------------------------------------------------
+const bikeType = BIKE_TYPES.sport;
+const bike = new Bike(bikeType, track);
+bike.resetTo(track.getStartTransform(0));
+
+const model = createBikeModel({ type: "sport", color: bikeType.color, materials });
+const leanPivot = model.getObjectByName("leanPivot");
+const wheelFront = model.getObjectByName("wheelFront");
+const wheelBack = model.getObjectByName("wheelBack");
+scene.add(model);
+
+const chase = new ChaseCamera(camera);
+chase.snapTo(bike);
+
+// --- Interface ---------------------------------------------------------
+const input = createInput();
+const hud = createHUD();
+const fps = createFpsMeter();
+showControlsHint();
+
+// Alleen bij ?debug: maak de moto en het circuit bereikbaar vanuit de browserconsole (voor testen).
+if (new URLSearchParams(location.search).has("debug")) window.__game = { bike, track };
+
+// Zet het 3D-model op de plek van de fysica-moto.
+// De fysica (Bike) rekent, het model (BikeModel) volgt alleen.
+function syncModel(dt) {
+  model.position.copy(bike.position);
+  model.rotation.y = bike.heading;
+  leanPivot.rotation.z = bike.lean;
+  // Wielen draaien: afgelegde afstand / straal = hoek. Negatief = vooruit rollen naar -Z.
+  const spin = (bike.speed * dt) / model.userData.wheelRadius;
+  wheelFront.rotation.x -= spin;
+  wheelBack.rotation.x -= spin;
+}
+
+// --- Hoofdlus ----------------------------------------------------------
+startGameLoop({
+  // Vaste stap: 60 keer per seconde, los van de beeldsnelheid.
+  update(dt) {
+    bike.update(dt, input.read());
+  },
+  // Eén keer per getekend beeld.
+  render(dt) {
+    syncModel(dt);
+    chase.update(dt, bike);
+    lights.follow(bike.position);
+    hud.setSpeed(bike.speed * 3.6); // m/s naar km/u
+    hud.setSurface(bike.surface);
+    renderer.render(scene, camera);
+    fps.tick();
+  },
+});
+
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-// Hoofdlus: elk beeld de kubus een beetje draaien en tekenen.
-const fps = createFpsMeter();
-const clock = new THREE.Clock();
-renderer.setAnimationLoop(() => {
-  const dt = clock.getDelta();
-  cube.rotation.y += dt;
-  cube.rotation.x += dt * 0.5;
-  renderer.render(scene, camera);
-  fps.tick();
 });

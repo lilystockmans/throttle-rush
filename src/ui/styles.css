@@ -1,0 +1,168 @@
+/* Stijl van de interface boven het 3D-canvas: snelheidsmeter (HUD) en besturingshulp.
+   Alle kleuren staan bovenaan als variabelen, zodat je ze op één plek kunt aanpassen. */
+
+:root {
+  /* Kleuren */
+  --ui-ink: #1b2250;                         /* donker marineblauw: paneel en tekstrand */
+  --ui-panel: rgba(27, 34, 80, 0.78);        /* halfdoorzichtig paneel, leesbaar op elke achtergrond */
+  --ui-text: #ffffff;
+  --ui-accent: #ffd23f;                      /* zonnig geel: snelheid en toetsen */
+  --ui-accent-2: #ff5d73;                    /* koraalrood: achteruit */
+  --ui-keycap: #fff6d6;
+  --ui-keycap-edge: #e0a82e;
+
+  /* Ondergrond-kleuren (zie surface-chip) */
+  --surface-road: #8d98c4;
+  --surface-curb: #ff5d73;
+  --surface-dirt: #d98c4a;
+  --surface-grass: #5fcf6b;
+
+  /* Lettertypen, met nette terugval als Google Fonts niet laadt */
+  --font-display: "Lilita One", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-text: "Nunito", system-ui, sans-serif;
+
+  /* Maten en tempo */
+  --ui-gap: 24px;
+  --ui-radius: 18px;
+  --ui-fade: 0.6s;
+}
+
+/* Laag over het hele scherm. Muisklikken gaan door naar het canvas. */
+#ui {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  font-family: var(--font-text);
+  color: var(--ui-text);
+  user-select: none;
+}
+
+/* ---------- Snelheidsmeter (rechtsonder) ---------- */
+
+.hud {
+  position: absolute;
+  right: var(--ui-gap);
+  bottom: var(--ui-gap);
+  width: 230px;                 /* vaste breedte: het paneel springt niet bij 9 -> 10 -> 100 */
+  padding: 10px 18px 12px;
+  box-sizing: border-box;
+  text-align: right;
+  background: var(--ui-panel);
+  border: 3px solid var(--ui-accent);
+  border-radius: var(--ui-radius);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+}
+
+.hud__speed {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.hud__value {
+  display: inline-block;
+  min-width: 3ch;               /* ruimte voor 3 cijfers, getal blijft rechts uitgelijnd */
+  font-family: var(--font-display);
+  font-size: 72px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;   /* alle cijfers even breed */
+  color: var(--ui-accent);
+  text-shadow: 0 3px 0 var(--ui-ink), 0 0 10px rgba(27, 34, 80, 0.6);
+}
+
+.hud__unit {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--ui-text);
+  text-shadow: 0 2px 0 var(--ui-ink);
+}
+
+/* Achteruit: getal wordt koraalrood */
+.hud.is-reverse { border-color: var(--ui-accent-2); }
+.hud.is-reverse .hud__value { color: var(--ui-accent-2); }
+
+/* Ondergrond-chip: klein blokje met de kleur van de ondergrond */
+.hud__surface {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 12px;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ui-ink);
+  background: var(--surface-road);
+  border-radius: 999px;
+}
+.hud__surface[data-surface="curb"]  { background: var(--surface-curb); color: #fff; }
+.hud__surface[data-surface="dirt"]  { background: var(--surface-dirt); }
+.hud__surface[data-surface="grass"] { background: var(--surface-grass); }
+
+/* ---------- Besturingshulp (linksonder) ---------- */
+
+.hint {
+  position: absolute;
+  left: var(--ui-gap);
+  bottom: var(--ui-gap);
+  padding: 14px 18px;
+  background: var(--ui-panel);
+  border: 3px solid var(--ui-accent);
+  border-radius: var(--ui-radius);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25);
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--ui-fade) ease, transform var(--ui-fade) ease;
+}
+
+/* Klasse die controlsHint.js toevoegt vlak voor het verwijderen */
+.hint.is-hiding {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.hint__title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: normal;
+  color: var(--ui-accent);
+}
+
+.hint__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 15px;
+  text-shadow: 0 1px 0 var(--ui-ink);
+}
+
+.hint__label { margin-left: 6px; }
+.hint__or { opacity: 0.7; font-size: 13px; }
+
+/* Keycap: een toets met een "dikke onderrand" zodat hij ingedrukt kan lijken */
+.keycap {
+  display: inline-block;
+  min-width: 26px;
+  padding: 2px 7px;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--ui-ink);
+  text-shadow: none;
+  background: var(--ui-keycap);
+  border: 2px solid var(--ui-ink);
+  border-bottom-width: 4px;
+  border-radius: 7px;
+  box-shadow: 0 0 0 1px var(--ui-keycap-edge) inset;
+}
+
+/* Wie liever minder beweging heeft: geen schuivende overgang, alleen kort vervagen */
+@media (prefers-reduced-motion: reduce) {
+  .hint { transition: opacity 0.2s linear; transform: none; }
+  .hint.is-hiding { transform: none; }
+}

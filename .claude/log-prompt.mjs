@@ -40,7 +40,14 @@ function clean(text) {
 
 const input = readStdin();
 
+// Berichten van subagents en systeemmeldingen komen ook als "prompt" binnen.
+// Die zijn niet van Lily, dus die slaan we over.
+function isFromLily(prompt) {
+  return !/^\s*</.test(String(prompt || ""));
+}
+
 if (mode === "start") {
+  if (!isFromLily(input.prompt)) process.exit(0);
   fs.writeFileSync(pendingFile, JSON.stringify({ start: Date.now(), prompt: input.prompt || "" }));
 } else if (mode === "stop") {
   if (!fs.existsSync(pendingFile)) process.exit(0);
