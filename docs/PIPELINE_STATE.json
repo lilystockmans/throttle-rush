@@ -1,22 +1,57 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 1,
+  "currentPhase": 2,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
-    "0": { "name": "Opzet en publicatie-route", "status": "done" },
+    "0": {
+      "name": "Opzet en publicatie-route",
+      "status": "done"
+    },
     "1": {
       "name": "Circuit en rijden",
-      "status": "wacht op test van Lily",
-      "done": ["contracten 01-04", "circuit Zandstorm Ring 1198 m met dirt-shortcut", "3 biketypes in data", "Track, Bike, Input, GameLoop, ChaseCamera", "3 moto-modellen, wegmesh, 300 bomen, 60 kegels", "materialen, licht, lucht", "HUD en besturingsuitleg", "main.js integratie", "autopiloot-ronde: 33 s, 60 fps gem, 59.9 min", "tester-rapport docs/tests/fase1-tester.md"],
-      "open": ["stuurgevoel: tester vond sturen te nerveus (test onbetrouwbaar door achtergrond-tab), Lily beslist na eigen test", "nog niet gepusht/gepubliceerd"]
+      "status": "done",
+      "done": [
+        "contracten 01-04",
+        "circuit Zandstorm Ring 1198 m met dirt-shortcut",
+        "3 biketypes in data",
+        "Track, Bike, Input, GameLoop, ChaseCamera",
+        "3 moto-modellen, wegmesh, 300 bomen, 60 kegels",
+        "materialen, licht, lucht",
+        "HUD en besturingsuitleg",
+        "main.js integratie",
+        "autopiloot-ronde: 33 s, 60 fps gem, 59.9 min",
+        "tester-rapport docs/tests/fase1-tester.md",
+        "Lily: sturen goed, gepubliceerd, live gecontroleerd 60 fps"
+      ],
+      "open": [
+        "UI-panelen overlappen in vensters smaller dan ~1000 px (contract eiste pas vanaf 1280 px)"
+      ]
     },
-    "2": { "name": "Drie motortypes en ondergrond", "status": "pending" },
-    "3": { "name": "Race-logica en HUD", "status": "pending" },
-    "4": { "name": "Computer-tegenstanders", "status": "pending" },
-    "5": { "name": "Speciale knoppen en botsingen", "status": "pending" },
-    "6": { "name": "Polish (optioneel)", "status": "pending" },
-    "7": { "name": "Prestatie-check en eindpublicatie", "status": "pending" }
+    "2": {
+      "name": "Drie motortypes en ondergrond",
+      "status": "pending"
+    },
+    "3": {
+      "name": "Race-logica en HUD",
+      "status": "pending"
+    },
+    "4": {
+      "name": "Computer-tegenstanders",
+      "status": "pending"
+    },
+    "5": {
+      "name": "Speciale knoppen en botsingen",
+      "status": "pending"
+    },
+    "6": {
+      "name": "Polish (optioneel)",
+      "status": "pending"
+    },
+    "7": {
+      "name": "Prestatie-check en eindpublicatie",
+      "status": "pending"
+    }
   },
-  "nextStep": "Lily test fase 1 lokaal. Daarna stuurgevoel bijstellen indien nodig, pushen (= publiceren), fase 2."
+  "nextStep": "Fase 2: drie motortypes kiesbaar via menu, ondergrond-effect per type."
 }
