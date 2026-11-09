@@ -1,0 +1,87 @@
+/* Stijl van de race-interface (RaceUI.js): paneel linksboven, aftellen, melding en finish-scherm.
+   Gebruikt de kleuren en lettertypen uit styles.css. Beneden 1000 x 650 px wordt alles kleiner. */
+
+.race { position: absolute; inset: 0; pointer-events: none; }
+.race.is-hidden, .race .is-hidden { display: none; }
+
+/* ---------- Paneel linksboven (begint op 44 px: boven staat de FPS-teller van de debug-modus) ---------- */
+.race-panel { position: absolute; top: 44px; left: var(--ui-gap); min-width: 170px; padding: 8px 14px 10px; box-sizing: border-box;
+  background: var(--ui-panel); border: 3px solid var(--ui-accent); border-radius: var(--ui-radius); box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25); }
+.race-panel__lap { font-family: var(--font-display); font-size: 30px; line-height: 1.1; color: var(--ui-accent); text-shadow: 0 3px 0 var(--ui-ink); }
+.race-panel__row { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin-top: 4px; font-weight: 800; font-size: 14px; }
+.race-panel__label { text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.8; }
+.race-panel__time, .race-panel__best { font-family: var(--font-display); font-size: 22px; font-variant-numeric: tabular-nums; text-shadow: 0 2px 0 var(--ui-ink); }
+.race-panel__best { color: #7dffa0; }
+.race-panel__pos { display: inline-block; margin-top: 8px; padding: 1px 14px 3px; font-family: var(--font-display); font-size: 24px;
+  color: var(--ui-ink); background: var(--ui-accent); border-radius: 999px; }
+
+/* ---------- Aftellen (midden) ---------- */
+.race-countdown { position: absolute; left: 0; right: 0; top: 36%; transform: translateY(-50%); text-align: center; opacity: 0;
+  font-family: var(--font-display); font-size: clamp(90px, 24vh, 240px); line-height: 1; color: var(--ui-text);
+  -webkit-text-stroke: 6px var(--ui-ink); paint-order: stroke fill; text-shadow: 0 8px 0 var(--ui-ink), 0 0 30px rgba(27, 34, 80, 0.6); }
+.race-countdown.is-on { opacity: 1; }
+.race-countdown.is-go { color: #5dff7a; font-size: clamp(110px, 30vh, 300px); }
+.race-countdown.is-pop { animation: race-pop 0.8s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes race-pop { 0% { transform: translateY(-50%) scale(2.2); opacity: 0; } 25% { transform: translateY(-50%) scale(0.95); opacity: 1; }
+  45% { transform: translateY(-50%) scale(1); } 100% { transform: translateY(-50%) scale(0.85); opacity: 0; } }
+
+/* ---------- Korte melding (onder het aftel-gebied) ---------- */
+.race-flash { position: absolute; left: 0; right: 0; top: 60%; text-align: center; opacity: 0;
+  font-family: var(--font-display); font-size: clamp(30px, 6vh, 56px); color: var(--ui-accent); text-shadow: 0 4px 0 var(--ui-ink), 0 0 16px rgba(27, 34, 80, 0.7); }
+.race-flash.is-show { animation: race-flash 2s ease both; }
+@keyframes race-flash { 0% { opacity: 0; transform: translateY(12px); } 12% { opacity: 1; transform: none; } 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---------- Finish-scherm ---------- */
+.race-finish { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; box-sizing: border-box; padding: var(--ui-gap);
+  pointer-events: auto; background: rgba(27, 34, 80, 0.55); }
+.race-finish.is-open { display: flex; }
+.race-card { width: min(92vw, 460px); max-height: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 18px 22px 20px; text-align: center; background: var(--ui-panel); border: 4px solid var(--ui-accent); border-radius: var(--ui-radius);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3); animation: race-card-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes race-card-in { from { transform: scale(0.8); opacity: 0; } }
+.race-card__place { margin: 0; font-family: var(--font-display); font-weight: normal; font-size: 58px; line-height: 1; color: var(--ui-accent); text-shadow: 0 4px 0 var(--ui-ink); }
+.race-card__sub { font-weight: 800; font-size: 15px; opacity: 0.85; }
+.race-card__total { font-family: var(--font-display); font-size: 44px; font-variant-numeric: tabular-nums; text-shadow: 0 3px 0 var(--ui-ink); }
+.race-laps { width: 100%; min-height: 0; overflow-y: auto; display: grid; gap: 4px; margin-top: 4px; }
+.race-laps__row { display: flex; align-items: baseline; gap: 10px; padding: 3px 12px; font-weight: 800; font-size: 16px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+.race-laps__n { flex: 1; text-align: left; }
+.race-laps__t { font-family: var(--font-display); font-size: 20px; font-variant-numeric: tabular-nums; }
+.race-laps__row.is-best { color: var(--ui-ink); background: #7dffa0; }
+.race-laps__tag { padding: 0 8px; font-size: 12px; text-transform: uppercase; color: #7dffa0; background: var(--ui-ink); border-radius: 999px; }
+.race-card__bike { margin-top: 4px; font-weight: 800; font-size: 16px; color: var(--ui-accent); }
+.race-card__buttons { display: flex; gap: 12px; margin-top: 8px; }
+.race-btn { display: flex; flex-direction: column; align-items: center; padding: 6px 22px 8px; cursor: pointer; border: 3px solid var(--ui-ink); border-radius: 999px; color: var(--ui-ink); }
+.race-btn--go { background: var(--ui-accent); box-shadow: 0 5px 0 var(--ui-keycap-edge); }
+.race-btn--alt { background: #fff; box-shadow: 0 5px 0 #a9b0d8; }
+.race-btn:hover { transform: translateY(-2px); }
+.race-btn:active { transform: translateY(3px); }
+.race-btn__text { font-family: var(--font-display); font-size: 24px; line-height: 1.1; }
+.race-btn__key { font-weight: 800; font-size: 12px; opacity: 0.7; }
+
+/* ---------- Kleine schermen (zelfde grens als styles.css) ---------- */
+@media (max-width: 999px), (max-height: 649px) {
+  .race-panel { min-width: 140px; padding: 5px 10px 7px; }
+  .race-panel__lap { font-size: 22px; }
+  .race-panel__row { margin-top: 2px; font-size: 12px; }
+  .race-panel__time, .race-panel__best { font-size: 18px; }
+  .race-panel__pos { margin-top: 5px; font-size: 18px; }
+  .race-flash { top: 62%; }
+  /* Onderaan ruimte vrijhouden voor snelheidsmeter en uitleg; lijst in twee kolommen */
+  .race-finish { padding: 8px var(--ui-gap) 120px; }
+  .race-card { padding: 10px 16px 12px; gap: 3px; }
+  .race-card__place { font-size: 38px; }
+  .race-card__sub { font-size: 12px; }
+  .race-card__total { font-size: 32px; }
+  .race-laps { grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 90px; }
+  .race-laps__row { padding: 2px 8px; font-size: 13px; }
+  .race-laps__t { font-size: 16px; }
+  .race-card__bike { margin-top: 0; font-size: 14px; }
+  .race-card__buttons { margin-top: 4px; gap: 8px; }
+  .race-btn { padding: 3px 16px 5px; }
+  .race-btn__text { font-size: 19px; }
+  .race-btn__key { font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .race-countdown.is-pop, .race-card { animation: none; }
+}

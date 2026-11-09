@@ -21,3 +21,8 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 15:44:28 | 15:44:58 | 0m 30s | Game designer | Fase 2: herbalanceer bikeTypes op basis van gemeten rondetijden met de echte fysica (cross+shortcut moet 2-3% sneller zijn dan sport op asfalt) |
 | 2026-11-09 | 15:43:50 | 15:46:51 | 3m 01s | UX/UI-specialist | Fase 2: keuzemenu met drie moto-kaarten en stat-balken, HUD setVisible, Esc-regel in besturingsuitleg, kleine schermen volgens contract 05 |
 | 2026-11-09 | 15:50:37 | 15:51:00 | 0m 23s | Lily | don't forget to pulish to github as well so we have a history of the commits |
+| 2026-11-09 | 15:51:03 | 15:52:49 | 1m 46s | Lily | Ja, start fase 3 |
+| 2026-11-09 | 15:52:43 | 15:53:12 | 0m 29s | Game designer | Fase 3: voeg CONFIG.race toe (ronden, aftellen, controlepunten) volgens contract 06-A |
+| 2026-11-09 | 15:52:43 | 15:54:17 | 1m 34s | 3D-modelleur | Fase 3: startportaal met drie startlampen en setLights volgens contract 06-D |
+| 2026-11-09 | 15:52:43 | 15:54:51 | 2m 08s | UX/UI-specialist | Fase 3: race-interface (aftellen, ronde, tijden, positie, meldingen, finish-scherm) volgens contract 06-C |
+| 2026-11-09 | 15:52:43 | 15:55:51 | 3m 08s | Coder | Fase 3: RaceManager (aftellen, ronden, controlepunten buiten de shortcut, posities, gebeurtenissen) volgens contract 06-B |

@@ -45,7 +45,19 @@
     },
     "3": {
       "name": "Race-logica en HUD",
-      "status": "pending"
+      "status": "wacht op test van Lily",
+      "done": [
+        "contract 06",
+        "RaceManager met controlepunten buiten shortcut (coder-test: valsspelen geweigerd, shortcut geldig)",
+        "RaceUI: aftellen, ronde/tijden, meldingen, finish-scherm",
+        "startportaal met lampen 3-2-1-groen",
+        "Rider-klasse (src/game/Rider.js) voor speler en straks AI",
+        "browser-race: 3 ronden, finish-scherm, Opnieuw werkt, 60 fps"
+      ],
+      "open": [
+        "na de finish rolt de moto stuurloos door (het gras op)",
+        "geen aparte tester-run"
+      ]
     },
     "4": {
       "name": "Computer-tegenstanders",
@@ -64,5 +76,5 @@
       "status": "pending"
     }
   },
-  "nextStep": "Fase 3: aftellen, 3 ronden, checkpoints, rondetijden, finish-scherm, opnieuw."
+  "nextStep": "Lily test fase 3. Daarna fase 4: 5 computer-tegenstanders."
 }

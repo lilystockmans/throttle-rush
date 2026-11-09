@@ -15,4 +15,9 @@ export const CONFIG = {
     followSharpness: 6,      // hoe snel de camera volgt (hoger = strakker, lager = zweveriger)
     speedFovBoost: 14,       // extra graden fov bij topsnelheid (gevoel van snelheid)
   },
+  race: {
+    laps: 3,                 // aantal ronden (3 x ~31 s = ~95 s racen, kort genoeg om snel opnieuw te proberen)
+    countdownSeconds: 3,     // s aftellen: 3, 2, 1, dan GO
+    checkpointCount: 5,      // controlepunten per ronde, gelijk verdeeld buiten het stuk dat de shortcut overslaat (~150 m tussenruimte)
+  },
 };
