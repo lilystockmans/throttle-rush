@@ -1,8 +1,10 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 0,
+  "currentPhase": 1,
+  "liveUrl": "https://throttle-rush-dun.vercel.app",
+  "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
-    "0": { "name": "Opzet en publicatie-route", "status": "in_progress", "done": ["git init", "vite + three", "lege scene", "fps-meter", "prompt-log haken"], "todo": ["contracten (wacht op md-beslissing)", "vercel publicatie (wacht op keuze)"] },
+    "0": { "name": "Opzet en publicatie-route", "status": "done", "done": ["git init", "vite + three", "lege scene", "fps-meter", "prompt-log haken", "contract 00-conventies", "github repo + vercel, live 200 OK, 60 fps"] },
     "1": { "name": "Circuit en rijden", "status": "pending" },
     "2": { "name": "Drie motortypes en ondergrond", "status": "pending" },
     "3": { "name": "Race-logica en HUD", "status": "pending" },
@@ -11,5 +13,5 @@
     "6": { "name": "Polish (optioneel)", "status": "pending" },
     "7": { "name": "Prestatie-check en eindpublicatie", "status": "pending" }
   },
-  "nextStep": "Fase 0 afronden: Vercel-publicatie, daarna commit."
+  "nextStep": "Fase 1: contracten schrijven voor circuit en rijden, dan specialisten inzetten."
 }
