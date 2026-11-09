@@ -20,3 +20,4 @@ Alleen prompts en duur. Geen output.
 | 2026-11-09 | 15:42:56 | 15:44:52 | 1m 57s | Lily | Ja, start fase 2 |
 | 2026-11-09 | 15:44:28 | 15:44:58 | 0m 30s | Game designer | Fase 2: herbalanceer bikeTypes op basis van gemeten rondetijden met de echte fysica (cross+shortcut moet 2-3% sneller zijn dan sport op asfalt) |
 | 2026-11-09 | 15:43:50 | 15:46:51 | 3m 01s | UX/UI-specialist | Fase 2: keuzemenu met drie moto-kaarten en stat-balken, HUD setVisible, Esc-regel in besturingsuitleg, kleine schermen volgens contract 05 |
+| 2026-11-09 | 15:50:37 | 15:51:00 | 0m 23s | Lily | don't forget to pulish to github as well so we have a history of the commits |
