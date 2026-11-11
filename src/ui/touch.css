@@ -1,0 +1,159 @@
+/* Stijl en layout voor de aanraakbediening (touchControls.js) en de verplaatsing van bestaande onderdelen
+   bij een aanraakscherm (klasse is-touch op <html>). Maten schalen mee met de hoogte, zodat alles op
+   375 px hoogte nog past. Controle: 844 x 390 en 667 x 375 liggend. */
+
+:root {
+  --tc-margin: clamp(8px, 3vh, 16px);
+  --tc-arrow: clamp(64px, 22vh, 96px);       /* pijlknoppen, minimaal 56 px tikdoel */
+  --tc-gas: clamp(80px, 26vh, 112px);        /* gas, minimaal 80 px */
+  --tc-small: clamp(56px, 17vh, 76px);       /* rem en speciaal */
+  --tc-top-h: clamp(40px, 11vh, 48px);       /* kleine knopjes bovenin; tikvlak wordt via ::after 56 px */
+  --tc-gap: clamp(6px, 2vh, 12px);
+}
+
+/* ---------- Laag met knoppen ---------- */
+
+.touch-controls {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;                      /* alleen de knoppen vangen aanraking */
+}
+.touch-controls.is-hidden { display: none; }
+
+.touch-group { position: absolute; display: flex; align-items: flex-end; gap: var(--tc-gap); }
+.touch-group--steer {
+  left: max(var(--tc-margin), env(safe-area-inset-left));
+  bottom: max(var(--tc-margin), env(safe-area-inset-bottom));
+}
+.touch-group--drive {
+  right: max(var(--tc-margin), env(safe-area-inset-right));
+  bottom: max(var(--tc-margin), env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas: ". action" "brake throttle";
+  justify-items: end;
+  align-items: end;
+}
+.touch-group--top {
+  top: var(--tc-margin);
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+}
+
+/* ---------- Knoppen ---------- */
+
+.touch-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  pointer-events: auto;
+  background: var(--ui-panel);
+  color: var(--ui-text);
+  border: 3px solid var(--ui-accent);
+  border-radius: var(--ui-radius);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25);
+  font-family: var(--font-display);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.06s ease, background 0.06s ease, box-shadow 0.06s ease;
+}
+/* Ingedrukt: omlaag, geel gevuld */
+.touch-btn.is-pressed {
+  transform: translateY(4px);
+  background: var(--ui-accent);
+  color: var(--ui-ink);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.touch-btn--left,
+.touch-btn--right {
+  width: var(--tc-arrow);
+  height: var(--tc-arrow);
+  font-size: calc(var(--tc-arrow) * 0.5);
+}
+
+.touch-btn--throttle {
+  grid-area: throttle;
+  width: var(--tc-gas);
+  height: var(--tc-gas);
+  font-size: calc(var(--tc-gas) * 0.28);
+  border-radius: 50%;
+}
+.touch-btn--brake {
+  grid-area: brake;
+  width: var(--tc-small);
+  height: var(--tc-small);
+  margin-right: var(--tc-gap);
+  font-size: calc(var(--tc-small) * 0.28);
+  border-color: var(--ui-accent-2);
+}
+.touch-btn--brake.is-pressed { background: var(--ui-accent-2); color: var(--ui-text); }
+.touch-btn--action {
+  grid-area: action;
+  width: var(--tc-small);
+  height: var(--tc-small);
+  margin-bottom: var(--tc-gap);
+  border-radius: 50%;
+  font-size: calc(var(--tc-small) * 0.24);
+}
+
+.touch-btn--reset,
+.touch-btn--menu {
+  height: var(--tc-top-h);
+  padding: 0 14px;
+  font-size: 14px;
+  white-space: nowrap;
+  border-radius: 999px;
+}
+/* Onzichtbaar groter tikvlak, zodat het kleine knopje toch 56 px hoog is */
+.touch-btn--reset::after,
+.touch-btn--menu::after { content: ""; position: absolute; inset: -8px -4px; }
+
+/* ---------- Draai-melding (alleen bij aanraakscherm in staande stand) ---------- */
+
+.touch-rotate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  pointer-events: auto;                      /* blokkeert aanraking eronder */
+  background: var(--ui-ink);
+  color: var(--ui-text);
+  font-family: var(--font-display);
+  font-size: 28px;
+  text-align: center;
+  touch-action: none;
+}
+@media (orientation: portrait) {
+  .is-touch .touch-rotate { display: flex; }
+}
+.touch-rotate__icon {
+  font-size: 84px;
+  line-height: 1;
+  animation: touch-rotate-spin 2.4s ease-in-out infinite;
+}
+@keyframes touch-rotate-spin {
+  0%, 15% { transform: rotate(0deg); }
+  60%, 100% { transform: rotate(-90deg); }
+}
+
+/* ---------- Layout van bestaande onderdelen bij aanraking ---------- */
+
+.is-touch .hud {
+  left: 50% !important;
+  right: auto !important;
+  bottom: max(var(--tc-margin), env(safe-area-inset-bottom)) !important;
+  transform: translateX(-50%);
+}
+.is-touch .hint { display: none !important; }

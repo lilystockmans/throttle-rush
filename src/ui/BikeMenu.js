@@ -3,6 +3,8 @@
 // hide() sluit het. De toetsenbord-luisteraar staat alleen aan zolang het menu open is.
 // De balken worden niet ingetypt maar berekend uit de moto-gegevens (hoogste van de drie = 100%).
 
+import { isTouchDevice } from "./touchControls.js";
+
 const VOLGORDE = ["sport", "cross", "cruiser"]; // volgorde van de kaarten, van links naar rechts
 
 // Korte uitleg per moto (de sleutel komt uit bikeTypes)
@@ -112,7 +114,10 @@ export function createBikeMenu({ bikeTypes, onHover, onChoose }) {
   const startKnop = maakElement("div", "menu__start", "Start");
   startKnop.setAttribute("role", "button");
   startKnop.addEventListener("click", () => start());
-  const uitleg = maakElement("p", "menu__keys", "Kies met ← → of A D. Start met Enter, spatie of klik.");
+  const aanraking = isTouchDevice();
+  const uitleg = maakElement("p", "menu__keys", aanraking
+    ? "Tik op een moto om te kiezen en tik op Start."
+    : "Kies met ← → of A D. Start met Enter, spatie of klik.");
 
   const onder = maakElement("div", "menu__bottom");
   onder.append(kaartenRij, startKnop, uitleg);

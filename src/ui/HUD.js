@@ -5,6 +5,8 @@
 // flashHit() toont een korte rode melding (bv. "Geduwd!") bovenaan het midden. Stijl: src/ui/ability.css.
 // Achteruit rijden: we tonen het getal zonder minteken, in rood. Zo blijft het getal even breed en leest het sneller dan "-12".
 
+import { isTouchDevice } from "./touchControls.js";
+
 // Nederlandse namen bij de ondergronden uit het contract
 const SURFACE_NAMES = {
   road: "asfalt",
@@ -25,7 +27,8 @@ function maakElement(tag, klasse, tekst) {
 const STAPPEN = 50;
 
 // Tekst naast de naam, per toestand (bij afkoelen tonen we het percentage)
-const LABEL_KLAAR = "SPATIE";
+// Op een aanraakscherm is er geen spatiebalk: dan heet het "KNOP" (zoals op het scherm).
+const LABEL_KLAAR = isTouchDevice() ? "KNOP" : "SPATIE";
 const LABEL_ACTIEF = "ACTIEF";
 
 // Namen langer dan dit aantal tekens worden kleiner getoond (CSS: .ability__name.is-long)

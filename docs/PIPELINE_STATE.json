@@ -1,6 +1,6 @@
 {
   "project": "Throttle Rush",
-  "currentPhase": 8,
+  "currentPhase": 9,
   "liveUrl": "https://throttle-rush-dun.vercel.app",
   "repo": "https://github.com/lilystockmans/throttle-rush",
   "phases": {
@@ -143,6 +143,21 @@
         "getest: geen overlap op 1280x720 en 768x500, verborgen in menu, 0.005 ms per beeld, geen fouten in console"
       ],
       "open": []
+    },
+    "9": {
+      "name": "Telefoon en aanraakbediening",
+      "status": "done",
+      "done": [
+        "contract 11-telefoon.md",
+        "touchControls.js + touch.css (UX/UI)",
+        "Input.setTouch (coder)",
+        "koppeling main.js, index.html, BikeMenu, HUD-label",
+        "getest in telefoonformaat 844x390 en 667x375: geen overlap, multi-touch, menu-knop, draai-melding"
+      ],
+      "open": [
+        "Echte telefoon testen door Lily",
+        "fps op echte telefoon"
+      ]
     }
   },
   "nextStep": "Klaar. Volgende: minimap in een aparte sessie."

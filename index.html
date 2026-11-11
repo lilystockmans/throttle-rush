@@ -2,7 +2,7 @@
 <html lang="nl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
     <title>Throttle Rush</title>
 
     <!-- Lettertypen: Lilita One (dikke arcade-cijfers) en Nunito (leesbare tekst).
@@ -20,12 +20,15 @@
     <link rel="stylesheet" href="/src/ui/ability.css" />
     <link rel="stylesheet" href="/src/ui/sound.css" />
     <link rel="stylesheet" href="/src/ui/minimap.css" />
+    <link rel="stylesheet" href="/src/ui/touch.css" />
 
     <!-- Staat hier inline zodat de lichtblauwe achtergrond er al is
          voordat het externe CSS-bestand binnen is: geen wit scherm bij laden. -->
     <style>
       html, body { margin: 0; height: 100%; overflow: hidden; background: #87ceeb; }
-      canvas { display: block; }
+      canvas { display: block; touch-action: none; }
+      body { touch-action: none; -webkit-touch-callout: none; overscroll-behavior: none; }
+      .is-touch .menu__keys::after { display: none; }
     </style>
   </head>
   <body>

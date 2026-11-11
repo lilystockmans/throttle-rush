@@ -26,6 +26,7 @@ import { createBikeMenu } from "./ui/BikeMenu.js";
 import { createRaceUI } from "./ui/RaceUI.js";
 import { createSoundToggle } from "./ui/soundToggle.js";
 import { createMinimap } from "./ui/Minimap.js";
+import { createTouchControls } from "./ui/touchControls.js";
 import { createAudio } from "./audio/AudioEngine.js";
 import { createDust } from "./world/dust.js";
 import { RaceEffects } from "./game/RaceEffects.js";
@@ -77,6 +78,11 @@ const effects = new RaceEffects({ audio, dust });
 
 // --- Interface ---------------------------------------------------------
 const input = createInput();
+// Aanraakknoppen (alleen op een telefoon of tablet); vullen dezelfde invoer als het toetsenbord.
+const touch = createTouchControls({
+  onChange: (state) => input.setTouch(state),
+  onMenu: () => { if (session && !session.isPlayerFinished()) openMenu(); },
+});
 const hud = createHUD();
 const fps = createFpsMeter();
 // Op een trage laptop gaat de kwaliteit vanzelf omlaag tot het vlot loopt.
@@ -119,6 +125,7 @@ function openMenu() {
   showPreview(lastTypeKey);
   hud.setVisible(false);
   minimap.setVisible(false);
+  touch.setVisible(false);
   raceUI.hideFinish();
   raceUI.setVisible(false);
   menu.show(lastTypeKey);
@@ -143,6 +150,7 @@ function startRace(typeKey) {
   session = new RaceSession({ track, scene, materials, gantry, raceUI, hud, minimap, effects, playerTypeKey: typeKey });
   chase.snapTo(session.player.bike);
   showControlsHint();
+  touch.setVisible(true);
   session.start();
 }
 
@@ -155,7 +163,7 @@ openMenu();
 
 // Alleen bij ?debug: maak de game bereikbaar vanuit de browserconsole (voor testen).
 if (new URLSearchParams(location.search).has("debug")) {
-  window.__game = { track, renderer, scene, camera, quality, audio, get session() { return session; }, startRace };
+  window.__game = { input, track, renderer, scene, camera, quality, audio, get session() { return session; }, startRace };
 }
 
 // --- Hoofdlus ----------------------------------------------------------
