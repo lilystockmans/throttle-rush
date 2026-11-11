@@ -152,11 +152,11 @@
         "touchControls.js + touch.css (UX/UI)",
         "Input.setTouch (coder)",
         "koppeling main.js, index.html, BikeMenu, HUD-label",
-        "getest in telefoonformaat 844x390 en 667x375: geen overlap, multi-touch, menu-knop, draai-melding"
+        "getest in telefoonformaat 844x390 en 667x375: geen overlap, multi-touch, menu-knop, draai-melding",
+        "Lily testte op een echte telefoon: werkt"
       ],
       "open": [
-        "Echte telefoon testen door Lily",
-        "fps op echte telefoon"
+        "fps op echte telefoon niet gemeten"
       ]
     }
   },
